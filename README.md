@@ -5,6 +5,9 @@ Gelbooru and Moebooru dedicated for small and medium communities. Its name [has
 its roots in Polish language and has onomatopeic meaning of scraping or
 scrubbing](https://sjp.pwn.pl/sjp/;2527372). It is pronounced as *shoorubooru*.
 
+# Warning
+This fork will likely diverge drastically from the upstream as I'm just using it as a starting point for my own version. Pull any changes at your own risk.
+
 ## Features
 
 - Post content: images (JPG, PNG, GIF, animated GIF), videos (MP4, WEBM), Flash animations
