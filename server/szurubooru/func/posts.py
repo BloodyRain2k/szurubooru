@@ -119,73 +119,69 @@ def _get_nearby_iter(post_list):
     return zip(previous_item, current_item, next_item)
 
 
-def get_post_content_url(post: model.Post) -> str:
+def get_post_filename(post: model.Post, include_suffix: bool = None) -> str:
     assert post
-    return "%s/posts/%s%d_%s.%s" % (
-        config.config["data_url"].rstrip("/"),
+    return "%s%d_%s" % (
         config.config["thumbnails"]["post_filename_prefix"],
         post.post_id,
         post.image_key,
-        mime.get_extension(post.mime_type) or "dat",
-    )
-
-
-def get_post_thumbnail_url(post: model.Post) -> str:
-    assert post
-    return "%s/generated-thumbnails/sample_%s%d_%s.jpg" % (
-        config.config["data_url"].rstrip("/"),
-        config.config["thumbnails"]["post_filename_prefix"],
-        post.post_id,
-        post.image_key,
-    )
-
-
-def get_post_custom_thumbnail_url(post: model.Post) -> str:
-    assert post
-    return "%s/generated-thumbnails/custom-thumbnails/sample_%s%d_%s.jpg" % (
-        config.config["data_url"].rstrip("/"),
-        config.config["thumbnails"]["post_filename_prefix"],
-        post.post_id,
-        post.image_key,
+    ) + (
+        "" if not include_suffix \
+        else ".%s" % (
+            mime.get_extension(post.mime_type) or "dat",
+        )
     )
 
 
 def get_post_content_path(post: model.Post) -> str:
     assert post
     assert post.post_id
-    return "posts/%s%d_%s.%s" % (
-        config.config["thumbnails"]["post_filename_prefix"],
-        post.post_id,
-        post.image_key,
-        mime.get_extension(post.mime_type) or "dat",
+    return "posts/%s" % (
+        get_post_filename(post, True),
     )
 
 
-def get_post_custom_content_path(post: model.Post) -> str:
+def get_post_content_url(post: model.Post) -> str:
     assert post
-    assert post.post_id
-    return "posts/custom-thumbnails/%s%d_%s.dat" % (
-        config.config["thumbnails"]["post_filename_prefix"],
-        post.post_id,
-        post.image_key,
+    return "%s/%s" % (
+        config.config["data_url"].rstrip("/"),
+        get_post_content_path(post),
     )
 
 
 def get_post_thumbnail_path(post: model.Post) -> str:
     assert post
-    return "generated-thumbnails/sample_%s%d_%s.jpg" % (
-        config.config["thumbnails"]["post_filename_prefix"],
-        post.post_id,
-        post.image_key,
+    return "generated-thumbnails/%s.jpg" % (
+        get_post_filename(post),
+    )
+
+
+def get_post_thumbnail_url(post: model.Post) -> str:
+    assert post
+    return "%s/%s" % (
+        config.config["data_url"].rstrip("/"),
+        get_post_thumbnail_path(post),
     )
 
 
 def get_post_custom_thumbnail_path(post: model.Post) -> str:
     assert post
-    return "generated-thumbnails/custom-thumbnails/sample_%s%d_%s.jpg" % (
-        config.config["thumbnails"]["post_filename_prefix"],
-        post.post_id,
-        post.image_key,
+    return "generated-thumbnails/custom-thumbnails/%s.jpg" % (
+        get_post_filename(post),
+    )
+
+
+def get_post_custom_thumbnail_url(post: model.Post) -> str:
+    assert post
+    return "%s/%s" % (
+        config.config["data_url"].rstrip("/"),
+        get_post_custom_thumbnail_path(post),
+    )
+def get_post_custom_content_path(post: model.Post) -> str:
+    assert post
+    assert post.post_id
+    return "posts/custom-thumbnails/%s.dat" % (
+        get_post_filename(post),
     )
 
 
@@ -514,8 +510,8 @@ def _before_post_delete(
 ) -> None:
     if post.post_id:
         if config.config["delete_source_files"]:
-            pattern = config.config["thumbnails"]["post_filename_prefix"] + post.post_id + "_*"
-            for file in files.find("posts", "**/" + pattern, recursive=True) + files.find("generated-thumbnails", "**/sample_" + pattern, recursive=True):
+            pattern = "**/" + config.config["thumbnails"]["post_filename_prefix"] + post.post_id + "_*"
+            for file in files.find("posts", pattern, recursive=True) + files.find("generated-thumbnails", pattern, recursive=True):
                 files.delete(file)
 
 
