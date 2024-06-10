@@ -7,6 +7,7 @@ version: '2'
 services:
 
   server:
+    container_name: sz_server
     image: szurubooru/server:latest
     depends_on:
       - sql
@@ -27,6 +28,7 @@ services:
       - "./server/config.yaml:/opt/app/config.yaml"
 
   client:
+    container_name: sz_client
     image: szurubooru/client:latest
     depends_on:
       - server
@@ -39,6 +41,7 @@ services:
       - "${PORT}:80"
 
   sql:
+    container_name: sz_sql
     image: postgres:11-alpine
     restart: unless-stopped
     environment:
