@@ -3,6 +3,7 @@ import os
 import threading
 import time
 from typing import Any, Callable, Type
+import debugpy
 
 import coloredlogs
 import sqlalchemy as sa
@@ -140,6 +141,13 @@ def create_app() -> Callable[[Any, Any], Any]:
     coloredlogs.install(fmt="[%(asctime)-15s] %(name)s %(message)s")
     if config.config["debug"]:
         logging.getLogger("szurubooru").setLevel(logging.INFO)
+        logger = logging.getLogger("szurubooru")
+        debugpy.listen(("0.0.0.0", 5678))
+        if config.config.get("debug_wait"):
+            logger.info("Waiting for debugger attach...")
+            debugpy.wait_for_client()  # Pause the program until a remote debugger is attached
+            logger.info("Debugger attached, starting execution...")
+
     if config.config["show_sql"]:
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 

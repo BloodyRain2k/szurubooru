@@ -26,6 +26,8 @@ services:
     volumes:
       - "${MOUNT_DATA}:/data"
       - "./server/config.yaml:/opt/app/config.yaml"
+    ports:
+      - "56789:5678"
 
   client:
     container_name: sz_client

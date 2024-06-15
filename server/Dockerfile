@@ -31,7 +31,7 @@ RUN apk --no-cache add \
         "pyheif==0.6.1" \
         "heif-image-plugin>=0.3.2" \
         youtube_dl \
-        "pillow-avif-plugin>=1.1.0" \
+        debugpy \
  && apk --no-cache del py3-pip
 
 COPY ./ /opt/app/
