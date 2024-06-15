@@ -118,13 +118,24 @@ class Image:
     def to_jpeg(self) -> bytes:
         return self._execute(
             [
-                "-quality",
-                "85",
-                "-sample",
-                "1x1",
+                "-f",
+                "lavfi",
+                "-i",
+                "color=white:s=%dx%d" % (self.width, self.height),
+                "-i",
                 "{path}",
-            ],
-            program="cjpeg",
+                "-f",
+                "image2",
+                "-filter_complex",
+                "overlay",
+                "-map",
+                "0:v:0",
+                "-vframes",
+                "1",
+                "-vcodec",
+                "mjpeg",
+                "-",
+            ]
         )
 
     def to_webm(self) -> bytes:
