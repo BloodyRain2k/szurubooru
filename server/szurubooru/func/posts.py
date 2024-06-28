@@ -121,10 +121,11 @@ def _get_nearby_iter(post_list):
 
 def get_post_filename(post: model.Post, include_suffix: bool = None) -> str:
     assert post
-    return "%s%d_%s" % (
-        config.config["thumbnails"]["post_filename_prefix"],
+    return "%s%d_%s%s" % (
+    	config.config["thumbnails"]["post_filename_prefix"],
         post.post_id,
         post.image_key,
+        config.config["thumbnails"]["post_filename_suffix"],
     ) + (
         "" if not include_suffix \
         else ".%s" % (
