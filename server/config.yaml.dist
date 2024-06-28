@@ -101,6 +101,7 @@ privileges:
     'posts:reverse_search':         regular
     'posts:view':                   anonymous
     'posts:view:featured':          anonymous
+    'posts:view:unsafe':            regular
     'posts:edit:alt_text':          power
     'posts:edit:content':           power
     'posts:edit:description':       power
