@@ -54,10 +54,12 @@ def get_avatar_url(user: model.User) -> str:
             config.config["thumbnails"]["avatar_width"],
         )
     assert user.name
-    return "%s/avatars/%s_%s.jpg" % (
+    return "%s/%s" % (
         config.config["data_url"].rstrip("/"),
-        user.name.lower(),
-        user.image_key,
+        get_avatar_path(
+            user.name,
+            user.image_key,
+        )
     )
 
 
@@ -311,8 +313,8 @@ def update_user_avatar(
         user.avatar_style = user.AVATAR_GRAVATAR
     elif avatar_style == "manual":
         user.avatar_style = user.AVATAR_MANUAL
-        avatar_path = "avatars/%s_%s.jpg" % (
-            user.name.lower(),
+        avatar_path = get_avatar_path(
+            user.name,
             user.image_key,
         )
         if not avatar_content:
@@ -325,11 +327,11 @@ def update_user_avatar(
             int(config.config["thumbnails"]["avatar_height"]),
         )
         user.image_key = auth.create_password()
-        avatar_path = "avatars/%s_%s.jpg" % (
-            user.name.lower(),
+        avatar_path = get_avatar_path(
+            user.name,
             user.image_key,
         )
-        files.save(avatar_path, image.to_jpeg())
+        files.save(avatar_path, image.to_png() if image.info["format"].get("has_alpha") else image.to_jpeg())
     else:
         raise InvalidAvatarError(
             "Avatar style %r is invalid. Valid avatar styles: %r."

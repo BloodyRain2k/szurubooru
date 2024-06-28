@@ -29,6 +29,14 @@ def check_for_loop(content: bytes) -> bytes:
     return "loop" in img.info
 
 
+def check_for_alpha(content: bytes) -> bool:
+    img = PILImage.open(BytesIO(content))
+    if img.mode == "RBG":
+        return False
+    alpha = img.getchannel("A").histogram()
+    return alpha[-1] < img.width * img.height
+
+
 class Image:
     def __init__(self, content: bytes) -> None:
         self.content = content
@@ -345,3 +353,5 @@ class Image:
             raise errors.ProcessingError(
                 "The video contains no video streams."
             )
+        if self.info["format"]["format_name"] == "png_pipe" and int(self.info["format"]["size"]) < 1024**2 * 5:
+            self.info["format"]["has_alpha"] = check_for_alpha(self.content)
