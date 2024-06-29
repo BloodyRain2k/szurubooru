@@ -140,8 +140,8 @@ def create_app() -> Callable[[Any, Any], Any]:
     validate_config()
     coloredlogs.install(fmt="[%(asctime)-15s] %(name)s %(message)s")
     if config.config["debug"]:
-        logging.getLogger("szurubooru").setLevel(logging.INFO)
         logger = logging.getLogger("szurubooru")
+        logger.setLevel(logging.INFO)
         debugpy.listen(("0.0.0.0", 5678))
         if config.config.get("debug_wait"):
             logger.info("Waiting for debugger attach...")

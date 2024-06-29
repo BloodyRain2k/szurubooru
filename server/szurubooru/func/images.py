@@ -31,7 +31,7 @@ def check_for_loop(content: bytes) -> bytes:
 
 def check_for_alpha(content: bytes) -> bool:
     img = PILImage.open(BytesIO(content))
-    if img.mode == "RBG":
+    if "A" not in img.mode.upper():
         return False
     alpha = img.getchannel("A").histogram()
     return alpha[-1] < img.width * img.height
