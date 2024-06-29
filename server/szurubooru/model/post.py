@@ -217,6 +217,7 @@ class Post(Base):
     description = sa.Column("description", sa.UnicodeText(), nullable=True)
     title = sa.Column("title", sa.UnicodeText(), nullable=True)
     alt_text = sa.Column("alt_text", sa.UnicodeText(), nullable=True)
+    directory = sa.Column("directory", sa.UnicodeText(8), nullable=True)
 
     # content description
     type = sa.Column("type", sa.Unicode(32), nullable=False)

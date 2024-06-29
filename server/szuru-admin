@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import time
+import sqlalchemy as sa
 from argparse import ArgumentParser
 from getpass import getpass
 from sys import stderr
@@ -100,6 +101,55 @@ def regenerate_thumbnails() -> None:
             pass
 
 
+def repack_directories() -> None:
+    postfuncs.set_directory(postfuncs.get_directory(get_min=True))
+    cur_dir = postfuncs.get_directory(True)
+    data_dir = config.config["data_dir"]
+    print(f'cur_dir:', cur_dir)
+    for loop in range(200):
+        posts = db.session.query(model.Post).filter(
+            sa.sql.expression.or_(
+                model.Post.directory > cur_dir,
+                model.Post.directory == None,
+                model.Post.directory == "",
+            )
+        ).order_by(model.Post.post_id.asc()).limit(1000)
+        if posts.count() == 0:
+            break
+        for post in posts:
+            print(f'post: {post.post_id} - {post.directory} -> {cur_dir}')
+            old_dir = post.directory
+            if old_dir and old_dir <= cur_dir:
+                print(f'skipping post {post.post_id}, old_dir = {old_dir}')
+                continue
+            moved = 0
+            for func in [postfuncs.get_post_content_path, postfuncs.get_post_thumbnail_path,
+                         postfuncs.get_post_custom_thumbnail_path]:
+                post.directory = old_dir
+                old_path = data_dir + func(post)
+                if not os.path.exists(old_path):
+                    print(f'missing: {old_path}')
+                    continue
+                post.directory = cur_dir
+                new_path = data_dir + func(post)
+                new_dir = '/'.join(new_path.split('/')[:-1])
+                print(old_path, '->', new_dir)
+                if not os.path.exists(new_dir):
+                    os.mkdir(new_dir)
+                os.rename(old_path, new_path)
+                moved += 1
+            if moved > 0:
+                update_stmt = sa.sql.expression.update(model.Post).where(
+                    model.Post.post_id == post.post_id
+                )
+                update_stmt = update_stmt.values(directory=cur_dir)
+                print(update_stmt)
+                db.session.execute(update_stmt)
+                db.get_session().commit()
+            cur_dir = postfuncs.get_directory(True)
+    pass
+
+
 def main() -> None:
     parser_top = ArgumentParser(
         description="Collection of CLI commands for an administrator to use",
@@ -129,6 +179,12 @@ def main() -> None:
         help="regenerate the thumbnails for posts if the "
         "thumbnail files are missing",
     )
+    parser.add_argument(
+        "--repack-directories",
+        action="store_true",
+        help="sets the `current_directory` to 0 and fills"
+        "the directories until the threshold",
+    )
     command = parser_top.parse_args()
 
     try:
@@ -140,6 +196,8 @@ def main() -> None:
             reset_filenames()
         elif command.regenerate_thumbnails:
             regenerate_thumbnails()
+        elif command.repack_directories:
+            repack_directories()
     except errors.BaseError as e:
         print(e, file=stderr)
 

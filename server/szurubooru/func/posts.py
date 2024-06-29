@@ -3,11 +3,12 @@ import logging
 from collections import namedtuple
 from datetime import datetime
 from itertools import tee, chain, islice
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import sqlalchemy as sa
 
-from szurubooru import config, db, errors, model, rest
+from szurubooru import db, errors, model, rest
+from szurubooru.config import config
 from szurubooru.func import (
     auth,
     comments,
@@ -24,6 +25,44 @@ from szurubooru.func import (
 )
 
 logger = logging.getLogger(__name__)
+
+_current_directory = ""
+
+def get_directory(check: bool = None, get_min: bool = None):
+    if not config["posts"]["use_directories"]:
+        return ""
+    dir_changed = False
+    global _current_directory
+    if not _current_directory:
+        set_directory(db.session.execute(
+            f"SELECT {'min' if get_min else 'max'}(trim(LEADING '0' FROM {model.Post.directory.key})) FROM post"
+        ).fetchone()[0])
+        dir_changed = True
+    if check:
+        while 1:
+            count = files.scan("posts/" + _current_directory).__len__()
+            if count >= config["posts"]["posts_per_directory"]:
+                set_directory(get_next_directory())
+                dir_changed = True
+            else:
+                break
+    if dir_changed:
+        logger.info(f'> new post directory: "{_current_directory}"')
+    return _current_directory
+
+def get_next_directory():
+    dir_num = int(get_directory())
+    return str(dir_num + 1)
+
+def set_directory(new_dir: Union[str,int]):
+    global _current_directory
+    new_dir = str(new_dir or 0)
+    padding = config["posts"]["directory_padding"]
+    if padding > 0:
+        while new_dir.__len__() < padding:
+            new_dir = f"0{new_dir}"
+    _current_directory = new_dir
+    return new_dir
 
 
 EMPTY_PIXEL = (
@@ -119,15 +158,17 @@ def _get_nearby_iter(post_list):
     return zip(previous_item, current_item, next_item)
 
 
-def get_post_filename(post: model.Post, include_suffix: bool = None) -> str:
+def get_post_filename(post: model.Post, without_suffix: bool = None, thumbnail: bool = None) -> str:
     assert post
-    return "%s%d_%s%s" % (
-    	config.config["thumbnails"]["post_filename_prefix"],
+    p_dir = post.directory + "/" if post.directory else ""
+    return "%s%s%d_%s%s" % (
+        p_dir,
+        (config["thumbnails"]["post_filename_prefix"] if thumbnail else ""),
         post.post_id,
         post.image_key,
-        config.config["thumbnails"]["post_filename_suffix"],
+        (config["thumbnails"]["post_filename_suffix"] if thumbnail else ""),
     ) + (
-        "" if not include_suffix \
+        "" if without_suffix or thumbnail \
         else ".%s" % (
             mime.get_extension(post.mime_type) or "dat",
         )
@@ -138,14 +179,14 @@ def get_post_content_path(post: model.Post) -> str:
     assert post
     assert post.post_id
     return "posts/%s" % (
-        get_post_filename(post, True),
+        get_post_filename(post),
     )
 
 
 def get_post_content_url(post: model.Post) -> str:
     assert post
     return "%s/%s" % (
-        config.config["data_url"].rstrip("/"),
+        config["data_url"].rstrip("/"),
         get_post_content_path(post),
     )
 
@@ -153,14 +194,14 @@ def get_post_content_url(post: model.Post) -> str:
 def get_post_thumbnail_path(post: model.Post) -> str:
     assert post
     return "generated-thumbnails/%s.jpg" % (
-        get_post_filename(post),
+        get_post_filename(post, thumbnail=True),
     )
 
 
 def get_post_thumbnail_url(post: model.Post) -> str:
     assert post
     return "%s/%s" % (
-        config.config["data_url"].rstrip("/"),
+        config["data_url"].rstrip("/"),
         get_post_thumbnail_path(post),
     )
 
@@ -168,16 +209,18 @@ def get_post_thumbnail_url(post: model.Post) -> str:
 def get_post_custom_thumbnail_path(post: model.Post) -> str:
     assert post
     return "generated-thumbnails/custom-thumbnails/%s.jpg" % (
-        get_post_filename(post),
+        get_post_filename(post, thumbnail=True),
     )
 
 
 def get_post_custom_thumbnail_url(post: model.Post) -> str:
     assert post
     return "%s/%s" % (
-        config.config["data_url"].rstrip("/"),
+        config["data_url"].rstrip("/"),
         get_post_custom_thumbnail_path(post),
     )
+
+
 def get_post_custom_content_path(post: model.Post) -> str:
     assert post
     assert post.post_id
@@ -244,6 +287,7 @@ class PostSerializer(serialization.BaseSerializer):
             "notes": self.serialize_notes,
             "comments": self.serialize_comments,
             "pools": self.serialize_pools,
+            "directory": self.serialize_directory,
         }
 
     def serialize_id(self) -> Any:
@@ -320,7 +364,7 @@ class PostSerializer(serialization.BaseSerializer):
                 for post in [
                     serialize_micro_post(try_get_post_by_id(rel.child_id), self.auth_user)
                     for rel in get_post_relations(self.post.post_id)
-                ]
+                ] if post
             }.values(),
             key=lambda post: post["id"],
         )
@@ -393,6 +437,9 @@ class PostSerializer(serialization.BaseSerializer):
                 self.post.pools, key=lambda pool: pool.creation_time
             )
         ]
+
+    def serialize_directory(self) -> Any:
+        return self.post.directory
 
 
 def serialize_post(
@@ -472,6 +519,7 @@ def create_post(
     post.checksum = ""
     post.mime_type = ""
     post.image_key = ""
+    post.directory = get_directory(True)
 
     update_post_content(post, content)
     new_tags = update_post_tags(post, tag_names)
@@ -516,8 +564,8 @@ def _before_post_delete(
     _mapper: Any, _connection: Any, post: model.Post
 ) -> None:
     if post.post_id:
-        if config.config["delete_source_files"]:
-            pattern = "**/" + config.config["thumbnails"]["post_filename_prefix"] + post.post_id + "_*"
+        if config["delete_source_files"]:
+            pattern = "**/" + config["thumbnails"]["post_filename_prefix"] + post.post_id + "_*"
             for file in files.find("posts", pattern, recursive=True) + files.find("generated-thumbnails", pattern, recursive=True):
                 files.delete(file)
 
@@ -550,7 +598,7 @@ def generate_alternate_formats(
     if mime.is_animated_gif(content):
         tag_names = [tag.first_name for tag in post.tags]
 
-        if config.config["convert"]["gif"]["to_mp4"]:
+        if config["convert"]["gif"]["to_mp4"]:
             mp4_post, new_tags = create_post(
                 images.Image(content).to_mp4(), tag_names, post.user
             )
@@ -559,7 +607,7 @@ def generate_alternate_formats(
             update_post_source(mp4_post, post.source)
             new_posts += [(mp4_post, new_tags)]
 
-        if config.config["convert"]["gif"]["to_webm"]:
+        if config["convert"]["gif"]["to_webm"]:
             webm_post, new_tags = create_post(
                 images.Image(content).to_webm(), tag_names, post.user
             )
@@ -612,7 +660,7 @@ def generate_post_signature(post: model.Post, content: bytes) -> None:
             )
         )
     except errors.ProcessingError:
-        if not config.config["allow_broken_uploads"]:
+        if not config["allow_broken_uploads"]:
             raise InvalidPostContentError(
                 "Unable to generate image hash data."
             )
@@ -682,7 +730,8 @@ def update_post_content(post: model.Post, content: Optional[bytes]) -> None:
 
     post.checksum = util.get_sha1(content)
     post.checksum_md5 = util.get_md5(content)
-    post.image_key = auth.create_password()
+    # post.image_key = auth.create_password()
+    post.image_key = post.image_key if post.image_key else post.checksum_md5
     other_post = (
         db.session.query(model.Post)
         .filter(model.Post.checksum == post.checksum)
@@ -707,7 +756,7 @@ def update_post_content(post: model.Post, content: Optional[bytes]) -> None:
         post.canvas_height = image.height
     except errors.ProcessingError as ex:
         logger.exception(ex)
-        if not config.config["allow_broken_uploads"]:
+        if not config["allow_broken_uploads"]:
             raise InvalidPostContentError("Unable to process image metadata")
         else:
             post.canvas_width = None
@@ -715,7 +764,7 @@ def update_post_content(post: model.Post, content: Optional[bytes]) -> None:
     if (post.canvas_width is not None and post.canvas_width <= 0) or (
         post.canvas_height is not None and post.canvas_height <= 0
     ):
-        if not config.config["allow_broken_uploads"]:
+        if not config["allow_broken_uploads"]:
             raise InvalidPostContentError(
                 "Invalid image dimensions returned during processing"
             )
@@ -737,8 +786,8 @@ def generate_post_thumbnail(path: str, content: bytes, seek=True) -> None:
         assert content
         image = images.Image(content)
         image.resize_fill(
-            int(config.config["thumbnails"]["post_width"]),
-            int(config.config["thumbnails"]["post_height"]),
+            int(config["thumbnails"]["post_width"]),
+            int(config["thumbnails"]["post_height"]),
             keep_transparency=False,
             seek=seek,
         )
