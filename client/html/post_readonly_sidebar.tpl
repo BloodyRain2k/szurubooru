@@ -49,7 +49,11 @@
             <section class='source'>
                 Source: <% for (let i = 0; i < ctx.post.sourceSplit.length; i++) { %>
                     <% if (i != 0) { %>&middot;<% } %>
-                    <a href='<%- ctx.post.sourceSplit[i] %>' title='<%- ctx.post.sourceSplit[i] %>'><%- ctx.extractRootDomain(ctx.post.sourceSplit[i]) %></a>
+                    <% if (ctx.post.sourceSplit[i].startsWith('file:') || ctx.post.sourceSplit[i].search(/^\w+:\/+/) == -1) { %>
+                        <span><%- ctx.post.sourceSplit[i].replace(/^file\:\/+/i, '') %></span>
+                    <% } else { %>
+                        <a href='<%- ctx.post.sourceSplit[i] %>' title='<%- ctx.post.sourceSplit[i] %>'><%- ctx.extractRootDomain(ctx.post.sourceSplit[i]) %></a>
+                    <% } %>
                 <% } %>
             </section>
         <% } %>

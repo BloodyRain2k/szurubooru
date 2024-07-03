@@ -197,6 +197,9 @@ class PostUploadController {
         if (uploadable.url) {
             post.source = uploadable.url;
         }
+        else if (uploadable.file) {
+            post.source = "file://" + uploadable.file.name;
+        }
         return post;
     }
 }
