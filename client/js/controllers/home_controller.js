@@ -1,9 +1,11 @@
 "use strict";
 
 const api = require("../api.js");
+const uri = require("../util/uri.js");
 const config = require("../config.js");
 const topNavigation = require("../models/top_navigation.js");
 const HomeView = require("../views/home_view.js");
+const Post = require("../models/post.js");
 
 class HomeController {
     constructor() {
@@ -22,6 +24,10 @@ class HomeController {
                 postCount: api.getPostCount(),
             });
         });
+        
+        api.get(uri.formatApiLink("featured-post")).then((response) => {
+            this._homeView.setFeaturedPost({ featuredPost: Post.fromResponse(response) });
+        })
     }
 
     showSuccess(message) {
