@@ -290,6 +290,7 @@ class PostSerializer(serialization.BaseSerializer):
             "comments": self.serialize_comments,
             "pools": self.serialize_pools,
             "directory": self.serialize_directory,
+            "tagNames": self.serialize_tag_names,
         }
 
     def serialize_id(self) -> Any:
@@ -349,6 +350,12 @@ class PostSerializer(serialization.BaseSerializer):
             }
             for tag in tags.sort_tags(self.post.tags)
         ]
+
+    def serialize_tag_names(self) -> Any:
+        tags = []
+        for tag in self.serialize_tags():
+            tags += tag["names"]
+        return tags
 
     def serialize_description(self) -> Any:
         return self.post.description
