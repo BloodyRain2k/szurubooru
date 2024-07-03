@@ -46,3 +46,7 @@ class BaseSearchConfig:
     @property
     def sort_columns(self) -> Dict[str, Tuple[SaColumn, str]]:
         return {}
+
+    @property
+    def group_filter(self) -> Optional[Filter]:
+        return None

@@ -7,6 +7,7 @@ class SearchQuery:
     def __init__(self) -> None:
         self.anonymous_tokens = []  # type: List[tokens.AnonymousToken]
         self.named_tokens = []  # type: List[tokens.NamedToken]
+        self.group_tokens = []  # type: List[tokens.GroupToken]
         self.special_tokens = []  # type: List[tokens.SpecialToken]
         self.sort_tokens = []  # type: List[tokens.SortToken]
 
@@ -15,6 +16,7 @@ class SearchQuery:
             (
                 tuple(self.anonymous_tokens),
                 tuple(self.named_tokens),
+                tuple(self.group_tokens),
                 tuple(self.special_tokens),
                 tuple(self.sort_tokens),
             )

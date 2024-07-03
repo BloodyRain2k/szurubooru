@@ -135,6 +135,9 @@ def apply_str_criterion_to_column(
             "Did you forget to escape the dots?"
         )
     else:
+        raise errors.SearchError(
+            "Unkown search criterion."
+        )
         assert False
     return expr
 
@@ -225,5 +228,53 @@ def create_subquery_filter(
         if negated:
             expression = ~expression
         return query.filter(expression)
+
+    return wrapper
+
+
+def create_subquery_group_filter(
+    left_id_column: SaColumn,
+    right_id_column: SaColumn,
+    filter_column: SaColumn,
+    filter_factory: SaColumn,
+    subquery_decorator: Callable[[SaQuery], None] = None,
+    order: SaQuery = None,
+) -> Filter:
+    filter_func = filter_factory(filter_column)
+
+    def wrapper(
+        query: SaQuery,
+        criterion: criteria.BaseCriterion,
+        negated: bool,
+    ) -> SaQuery:
+        assert criterion
+        if negated and isinstance(criterion, criteria.ArrayCriterion):
+            filtered = sa.sql.true()
+            for crit in criterion.values:
+                crit = criteria.PlainCriterion(crit, crit)
+                subquery = db.session.query(right_id_column.label("foreign_id"))
+                if subquery_decorator:
+                    subquery = subquery_decorator(subquery)
+                subquery = subquery.options(sa.orm.lazyload("*"))
+                subquery = filter_func(subquery, crit, False)
+                subquery = subquery.subquery("t")
+                expression = left_id_column.in_(subquery)
+                # if negated:
+                    # expression = ~expression
+                # filtered = filtered.filter(expression)
+                filtered &= expression
+            return query.filter(~filtered)
+        
+        else:
+            subquery = db.session.query(right_id_column.label("foreign_id"))
+            if subquery_decorator:
+                subquery = subquery_decorator(subquery)
+            subquery = subquery.options(sa.orm.lazyload("*"))
+            subquery = filter_func(subquery, criterion, False)
+            subquery = subquery.subquery("t")
+            expression = left_id_column.in_(subquery)
+            if negated:
+                expression = ~expression
+            return query.filter(expression)
 
     return wrapper

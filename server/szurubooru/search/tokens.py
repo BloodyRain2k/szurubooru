@@ -1,4 +1,4 @@
-from szurubooru.search.criteria import BaseCriterion
+from szurubooru.search.criteria import BaseCriterion, ArrayCriterion
 
 
 class AnonymousToken:
@@ -43,3 +43,16 @@ class SpecialToken:
 
     def __hash__(self) -> int:
         return hash((self.value, self.negated))
+
+
+class GroupToken:
+    def __init__(self, negated: bool) -> None:
+        self.tokens = [] # type: list[AnonymousToken]
+        self.negated = negated
+
+    def get_token(self):
+        group_tokens = [t.criterion.original_text for t in self.tokens]
+        return ArrayCriterion(" ".join(group_tokens), group_tokens)
+
+    def __hash__(self) -> int:
+        return hash(tuple(self.tokens) + (self.negated,))

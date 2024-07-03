@@ -1,6 +1,10 @@
 <p><strong>Anonymous tokens</strong></p>
 
 <p>Same as <code>tag</code> token.</p>
+<p>Normal brackets () can be used for OR matching tags, e.g. <code>( green_hair purple_hair )</code> will return all results with the tags "green_hair" or "purple_hair". The space between the brackets and tags are important, since tags can have brackets aswell.</p>
+<p>When negated with a -, it will instead be treated as an inclusive exclusion, meaning that <code>-( green_hair purple_hair )</code> will return all results that do NOT have the tags "green_hair" AND "purple_hair".</p>
+<p>Exclusion only happens if ALL tags in the brackets are present.</p>
+<p>A query can contain multiple groups, but these can ONLY contain tags. Anything else will result in unpredicted results. Groups can also NOT contain other groups.</p>
 
 <p><strong>Named tokens</strong></p>
 

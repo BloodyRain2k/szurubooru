@@ -484,6 +484,16 @@ class PostSearchConfig(BaseSearchConfig):
             "tumbleweed": self.tumbleweed_filter,
         }
 
+    @property
+    def group_filter(self) -> Optional[Filter]:
+        return search_util.create_subquery_group_filter(
+            model.Post.post_id,
+            model.PostTag.post_id,
+            model.TagName.name,
+            search_util.create_str_filter,
+            lambda subquery: subquery.join(model.Tag).join(model.TagName),
+        )
+
     def noop_filter(
         self,
         query: SaQuery,

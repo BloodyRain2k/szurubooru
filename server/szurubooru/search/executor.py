@@ -134,6 +134,15 @@ class Executor:
     def _prepare_db_query(
         self, db_query: SaQuery, search_query: SearchQuery, use_sort: bool
     ) -> SaQuery:
+        for group_token in search_query.group_tokens:
+            if not self.config.group_filter:
+                raise errors.SearchError(
+                    "Group tokens are not valid in this context."
+                )
+            db_query = self.config.group_filter(
+                db_query, group_token.get_token(), group_token.negated
+            )
+
         for anon_token in search_query.anonymous_tokens:
             if not self.config.anonymous_filter:
                 raise errors.SearchError(

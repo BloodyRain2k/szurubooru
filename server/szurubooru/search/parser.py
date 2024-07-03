@@ -72,6 +72,7 @@ def _parse_sort(value: str, negated: bool) -> tokens.SortToken:
 class Parser:
     def parse(self, query_text: str) -> SearchQuery:
         query = SearchQuery()
+        current_group = None # type: tokens.GroupToken # list[tokens.AnonymousToken] #
         for chunk in re.split(r"\s+", (query_text or "").lower()):
             if not chunk:
                 continue
@@ -81,6 +82,13 @@ class Parser:
                 negated = True
             if not chunk:
                 raise errors.SearchError("Empty negated token.")
+            if chunk == "(":
+                current_group = tokens.GroupToken(negated)
+                continue
+            if chunk == ")":
+                query.group_tokens.append(current_group)
+                current_group = None
+                continue
             match = re.match(r"^(.*?)(?<!\\):(.*)$", chunk)
             if match:
                 key, value = list(match.groups())
@@ -94,5 +102,7 @@ class Parser:
                         _parse_named(key, value, negated)
                     )
             else:
-                query.anonymous_tokens.append(_parse_anonymous(chunk, negated))
+                (query.anonymous_tokens if not current_group
+                 else current_group.tokens).append(_parse_anonymous(chunk, negated))
+
         return query
