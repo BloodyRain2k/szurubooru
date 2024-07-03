@@ -243,8 +243,10 @@ class PostSerializer(serialization.BaseSerializer):
         self.auth_user = auth_user
 
     def serialize(self, options: List[str]) -> Any:
+        if "safety" not in options:
+            options.append("safety")
         serial = super().serialize(options)
-        if serial["safety"] == SAFETY_MAP[model.Post.SAFETY_UNSAFE] and not auth.has_privilege(self.auth_user, "posts:view:unsafe"):
+        if serial.get("safety", "unsafe") == SAFETY_MAP[model.Post.SAFETY_UNSAFE] and not auth.has_privilege(self.auth_user, "posts:view:unsafe"):
             return
         return serial
 
