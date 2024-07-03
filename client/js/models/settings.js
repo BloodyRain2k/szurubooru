@@ -6,7 +6,7 @@ const defaultSettings = {
     listPosts: {
         safe: true,
         sketchy: true,
-        unsafe: true,
+        unsafe: false,
     },
     upscaleSmallPosts: false,
     endlessScroll: false,

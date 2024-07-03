@@ -43,6 +43,7 @@ class PostListController {
             hostNode: this._pageController.view.pageHeaderHolderNode,
             parameters: ctx.parameters,
             enableSafety: api.safetyEnabled(),
+            canViewPostsUnsafe: api.hasPrivilege("posts:view:unsafe"),
             canBulkEditTags: api.hasPrivilege("posts:bulk-edit:tags"),
             canBulkEditSafety: api.hasPrivilege("posts:bulk-edit:safety"),
             canBulkDelete: api.hasPrivilege("posts:bulk-edit:delete"),
