@@ -16,6 +16,7 @@ const defaultSettings = {
     tagSuggestions: true,
     autoplayVideos: false,
     postsPerPage: 42,
+    imagesPerRow: 7,
     tagUnderscoresAsSpaces: false,
     darkTheme: true,
 };

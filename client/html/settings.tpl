@@ -23,6 +23,16 @@
             </li>
 
             <li>
+                <%= ctx.makeNumericInput({
+                    text: 'Images per row',
+                    name: 'images-per-row',
+                    value: ctx.browsingSettings.imagesPerRow,
+                    min: 7,
+                    max: 10,
+                }) %>
+            </li>
+
+            <li>
                 <%= ctx.makeCheckbox({
                     text: 'Use dark theme',
                     name: 'dark-theme',
