@@ -301,6 +301,14 @@ class Post(Base):
     def flags(self, data: List[str]) -> None:
         self.flags_string = ",".join([x for x in data if x])
 
+    @property
+    def sources(self) -> List[str]:
+        return self.source.split("\n")
+
+    @sources.setter
+    def sources(self, sources: List[str]) -> None:
+        self.source = "\n".join(set(sources))
+
     score = sa.orm.column_property(
         sa.sql.expression.select(
             [

@@ -1037,10 +1037,18 @@ def merge_posts(
         target.flags = source.flags
         db.session.flush()
 
+    def merge_sources(source_post_id: int, target_post_id: int) -> None:
+        target = get_post_by_id(target_post_id)
+        source = get_post_by_id(source_post_id)
+        target.sources = target.sources + source.sources
+        db.session.flush()
+
     content = None
     if replace_content:
         content = files.get(get_post_content_path(source_post))
         transfer_flags(source_post.post_id, target_post.post_id)
+    
+    merge_sources(source_post.post_id, target_post.post_id)
 
     # fixes unknown issue with SA's cascade deletions
     purge_post_signature(source_post)
