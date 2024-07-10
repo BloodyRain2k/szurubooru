@@ -1,6 +1,13 @@
 <div class='post-merge'>
     <form>
         <ul class='input'>
+            <% if (ctx.post.relations && ctx.post.relations.length > 0) { %>
+                <li>Relations:
+                    <% for (let rel of ctx.post.relations) { %>
+                        <span><%= rel.id %></span>
+                    <% } %>
+                </li>
+            <% } %>
             <li class='post-mirror'>
                 <div class='left-post-container'></div>
                 <div class='right-post-container'></div>
