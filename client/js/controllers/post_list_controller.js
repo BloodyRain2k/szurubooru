@@ -169,6 +169,7 @@ class PostListController {
                         markedForDeletion: this._postsMarkedForDeletion,
                     },
                     imagesPerRow: parseInt(settings.get().imagesPerRow),
+                    imagesPerRowMobile: parseInt(settings.get().imagesPerRowMobile),
                 });
                 const view = new PostsPageView(pageCtx);
                 view.addEventListener("tag", (e) => this._evtTag(e));

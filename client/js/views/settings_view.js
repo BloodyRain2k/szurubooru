@@ -44,6 +44,7 @@ class SettingsView extends events.EventTarget {
                     autoplayVideos: this._find("autoplay-videos").checked,
                     postsPerPage: this._find("posts-per-page").value,
                     imagesPerRow: this._find("images-per-row").value,
+                    imagesPerRowMobile: this._find("images-per-row-mobile").value,
                     tagUnderscoresAsSpaces: this._find("underscores-as-spaces")
                         .checked,
                     darkTheme: this._find("dark-theme").checked,

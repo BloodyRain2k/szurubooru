@@ -1,6 +1,6 @@
 <div class='post-list'>
     <% if (ctx.response.results.length) { %>
-        <ul class='ipr<%= ctx.imagesPerRow || 7 %>'>
+        <ul class='ipr<%= ctx.imagesPerRow || 7 %> iprm<%= ctx.imagesPerRowMobile || 2 %>'>
             <% for (let post of ctx.response.results) { %>
                 <li data-post-id='<%= post.id %>'>
                     <a class='thumbnail-wrapper <%= !ctx.canBulkEditTags || post.tags.length > 0 ? "tags" : "no-tags" %>'

@@ -1,19 +1,28 @@
 @import colors
 
 .post-list
-    ul.ipr10
-        li
-            width: 9vw
-
-    ul.ipr9
-        li
-            width: 10vw
-
-    ul.ipr8
-        li
-            width: 11vw
-
     ul
+        @media (orientation: portrait)
+            &.iprm4
+                li
+                    min-width: 20vw
+
+            &.iprm3
+                li
+                    min-width: 27vw
+
+        &.ipr10
+            li
+                width: 9vw
+
+        &.ipr9
+            li
+                width: 10vw
+
+        &.ipr8
+            li
+                width: 11vw
+
         list-style-type: none
         margin: 0
         padding: 0

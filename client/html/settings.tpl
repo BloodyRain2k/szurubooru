@@ -24,11 +24,21 @@
 
             <li>
                 <%= ctx.makeNumericInput({
-                    text: 'Images per row',
+                    text: 'Images per row (Desktop)',
                     name: 'images-per-row',
                     value: ctx.browsingSettings.imagesPerRow,
                     min: 7,
                     max: 10,
+                }) %>
+            </li>
+
+            <li>
+                <%= ctx.makeNumericInput({
+                    text: 'Images per row (Mobile)',
+                    name: 'images-per-row-mobile',
+                    value: ctx.browsingSettings.imagesPerRowMobile,
+                    min: 2,
+                    max: 4,
                 }) %>
             </li>
 
