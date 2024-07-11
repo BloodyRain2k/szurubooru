@@ -53,6 +53,9 @@ class PostMergeView extends events.EventTarget {
 
     _refreshLeftSide() {
         this._refreshSide(this._leftPost, this._leftSideNode, "left", false);
+        for (let rel of this._hostNode.querySelectorAll("span.relation")) {
+            rel.onclick = (evt) => this._setPostField(evt.target.textContent);
+        }
     }
 
     _refreshRightSide() {
@@ -81,6 +84,11 @@ class PostMergeView extends events.EventTarget {
                 this._evtPostSearchButtonClick(e, postIdNode)
             );
         }
+    }
+    
+    _setPostField(num) {
+        this._rightSideNode.querySelector("input#merge-id-right").value = num;
+        this._rightSideNode.querySelector("header > input[type='button']").click();
     }
 
     _evtSubmit(e) {

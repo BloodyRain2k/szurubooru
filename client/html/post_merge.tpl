@@ -4,7 +4,7 @@
             <% if (ctx.post.relations && ctx.post.relations.length > 0) { %>
                 <li>Relations:
                     <% for (let rel of ctx.post.relations) { %>
-                        <span><%= rel.id %></span>
+                        <span class='relation'><%= rel.id %></span>
                     <% } %>
                 </li>
             <% } %>
