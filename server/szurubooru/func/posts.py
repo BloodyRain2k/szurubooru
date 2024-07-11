@@ -27,6 +27,8 @@ from szurubooru.func import (
 logger = logging.getLogger(__name__)
 
 _current_directory = ""
+_disk_usage = -1
+_disk_usage_avg = -1
 
 def get_directory(check: bool = None, get_min: bool = None):
     if not config["posts"]["use_directories"]:
@@ -63,6 +65,24 @@ def set_directory(new_dir: Union[str,int]):
             new_dir = f"0{new_dir}"
     _current_directory = new_dir
     return new_dir
+
+
+def get_disk_usage():
+    if _disk_usage < 0:
+        fetch_disk_usage()
+    return _disk_usage
+
+def get_disk_usage_avg():
+    if _disk_usage_avg < 0:
+        fetch_disk_usage()
+    return _disk_usage_avg
+
+def fetch_disk_usage():
+    global _disk_usage, _disk_usage_avg
+    _disk_usage, _disk_usage_avg = db.session.query(sa.func.sum(model.Post.file_size),
+                                                    sa.func.avg(model.Post.file_size)).one()
+    _disk_usage = int(_disk_usage)
+    _disk_usage_avg = int(_disk_usage_avg)
 
 
 EMPTY_PIXEL = (

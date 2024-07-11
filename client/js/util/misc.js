@@ -45,10 +45,10 @@ function formatFileSize(fileSize) {
     return _formatUnits(
         fileSize,
         1024,
-        ["B", "K", "M", "G"],
+        ["B", "KB", "MB", "GB"],
         (number, suffix) => {
             const decimalPlaces = number < 20 && suffix !== "B" ? 1 : 0;
-            return number.toFixed(decimalPlaces) + suffix;
+            return number.toFixed(decimalPlaces) + " " + suffix;
         }
     );
 }
