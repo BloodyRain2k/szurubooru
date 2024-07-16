@@ -168,6 +168,7 @@ FLAG_MAP = {
     model.Post.FLAG_LOOP: "loop",
     model.Post.FLAG_SOUND: "sound",
     model.Post.FLAG_TAGME: "tagme",
+    model.Post.FLAG_DELETE: "delete",
 }
 
 # https://stackoverflow.com/a/1012089

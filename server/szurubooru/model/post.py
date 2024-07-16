@@ -198,6 +198,7 @@ class Post(Base):
     FLAG_LOOP = "loop"
     FLAG_SOUND = "sound"
     FLAG_TAGME = "tagme"
+    FLAG_DELETE = "delete"
 
     # basic meta
     post_id = sa.Column("id", sa.Integer, primary_key=True)

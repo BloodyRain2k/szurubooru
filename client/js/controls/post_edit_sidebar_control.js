@@ -473,24 +473,34 @@ class PostEditSidebarControl extends events.EventTarget {
         return this._formNode.querySelector(".pools input");
     }
 
+    get _deleteFlatInputNode() {
+        return this._formNode.querySelector(".flags input[name=delete]") || {};
+    }
+
     get _loopVideoInputNode() {
-        return this._formNode.querySelector(".flags input[name=loop]");
+        return this._formNode.querySelector(".flags input[name=loop]") || {};
     }
 
     get _soundVideoInputNode() {
-        return this._formNode.querySelector(".flags input[name=sound]");
+        return this._formNode.querySelector(".flags input[name=sound]") || {};
     }
 
     get _videoFlags() {
-        if (!this._loopVideoInputNode) {
-            return undefined;
-        }
+        // if (!this._loopVideoInputNode) {
+        //     return undefined;
+        // }
         let ret = [];
+        if (this._deleteFlatInputNode.checked) {
+            ret.push("delete");
+        }
         if (this._loopVideoInputNode.checked) {
             ret.push("loop");
         }
         if (this._soundVideoInputNode.checked) {
             ret.push("sound");
+        }
+        if (ret.length == 0) {
+            return undefined;
         }
         return ret;
     }

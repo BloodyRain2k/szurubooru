@@ -175,12 +175,60 @@ class BulkDeleteEditor extends BulkEditor {
     }
 }
 
+class BulkFlagEditor extends BulkEditor {
+    constructor(hostNode) {
+        super(hostNode);
+        this._hostNode.addEventListener("submit", (e) =>
+            this._evtFormSubmit(e)
+        );
+    }
+
+    get value() {
+        return this._inputNode.value;
+    }
+
+    get _inputNode() {
+        return this._hostNode.querySelector("select[name=flag]");
+    }
+
+    focus() {
+        this._inputNode.focus();
+    }
+
+    blur() {
+        this._inputNode.blur();
+    }
+
+    _evtFormSubmit(e) {
+        e.preventDefault();
+        this.dispatchEvent(new CustomEvent("submit", { detail: {} }));
+    }
+
+    _evtOpenLinkClick(e) {
+        e.preventDefault();
+        this.toggleOpen(true);
+        this.focus();
+        this.dispatchEvent(new CustomEvent("open", { detail: {} }));
+        misc.enableExitConfirmation();
+    }
+
+    _evtCloseLinkClick(e) {
+        e.preventDefault();
+        this._inputNode.value = "";
+        this.toggleOpen(false);
+        this.blur();
+        this.dispatchEvent(new CustomEvent("close", { detail: {} }));
+        misc.disableExitConfirmation();
+    }
+}
+
 class PostsHeaderView extends events.EventTarget {
     constructor(ctx) {
         super();
 
         ctx.settings = settings.get();
         this._ctx = ctx;
+        this._ctx.flags = { delete: "Delete" };
         this._hostNode = ctx.hostNode;
         views.replaceContent(this._hostNode, template(ctx));
 
@@ -228,6 +276,13 @@ class PostsHeaderView extends events.EventTarget {
             this._bulkEditors.push(this._bulkDeleteEditor);
         }
 
+        if (this._bulkEditFlagNode) {
+            this._bulkFlagEditor = new BulkFlagEditor(
+                this._bulkEditFlagNode
+            );
+            this._bulkEditors.push(this._bulkFlagEditor);
+        }
+
         for (let editor of this._bulkEditors) {
             editor.addEventListener("submit", (e) => {
                 this._navigate();
@@ -248,6 +303,8 @@ class PostsHeaderView extends events.EventTarget {
             this._openBulkEditor(this._bulkSafetyEditor);
         } else if (ctx.parameters.delete && this._bulkDeleteEditor) {
             this._openBulkEditor(this._bulkDeleteEditor);
+        } else if (ctx.parameters.flag && this._bulkFlagEditor) {
+            this._openBulkEditor(this._bulkFlagEditor);
         }
     }
 
@@ -273,6 +330,10 @@ class PostsHeaderView extends events.EventTarget {
 
     get _bulkEditDeleteNode() {
         return this._hostNode.querySelector(".bulk-edit-delete");
+    }
+
+    get _bulkEditFlagNode() {
+        return this._hostNode.querySelector(".bulk-edit-flags");
     }
 
     _openBulkEditor(editor) {
@@ -345,6 +406,12 @@ class PostsHeaderView extends events.EventTarget {
             this._bulkDeleteEditor && this._bulkDeleteEditor.opened
                 ? "1"
                 : null;
+        if (this._bulkFlagEditor && this._bulkFlagEditor.opened) {
+            parameters.flag = this._bulkFlagEditor.value;
+            this._bulkFlagEditor.blur();
+        } else {
+            parameters.flag = null;
+        }
         this.dispatchEvent(
             new CustomEvent("navigate", { detail: { parameters: parameters } })
         );

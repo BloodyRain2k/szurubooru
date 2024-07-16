@@ -50,6 +50,10 @@
                                 <% } %>
                             </span>
                         <% } %>
+                        <% if (ctx.canBulkDelete && ctx.parameters && ctx.parameters.flag) { %>
+                            <a href class='flag-flipper'>
+                            </a>
+                        <% } %>
                         <% if (ctx.canBulkDelete && ctx.parameters && ctx.parameters.delete) { %>
                             <a href class='delete-flipper'>
                             </a>

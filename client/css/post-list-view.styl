@@ -159,6 +159,31 @@
                             color: white
                             content: '-'
 
+                .flag-flipper
+                    display: inline-block
+                    padding: 0.5em
+                    box-sizing: border-box
+                    border: 0
+                    &:after
+                        display: inline-block
+                        width: 1em
+                        height: 1em
+                        text-align: center
+                        line-height: 1em
+                        font-size: 2.2em
+                    &.flagged
+                        background: rgba(0, 230, 0, 0.7)
+                        &:after
+                            color: white
+                            content: '-'
+                    &:not(.flagged)
+                        background: rgba(255, 0, 0, 0.7)
+                        &:after
+                            color: white
+                            content: '+'
+                    &[data-disabled]
+                        background: rgba(200, 200, 200, 0.7)
+
             .thumbnail
                 width: 100%
                 height: 100%
@@ -196,6 +221,8 @@
     input
         margin-bottom: 0.25em
         margin-right: 0.25em
+    input[type=text],select
+        margin-top: -2px
     input[name=search-text]
         width: 25em
         @media (max-width: 1000px)
@@ -257,6 +284,30 @@
                 margin-left: 0
         .start
             margin-left: 1em
+    .bulk-edit-flags
+        &.opened
+            .hint
+                @media (max-width: 1000px)
+                    display: block
+                    margin-bottom: 0.5em
+        &:not(.opened)
+            select,
+            .start
+                display: none
+            .hint
+                display: none
+        select[name=flag]
+            width: unset
+            @media (max-width: 1000px)
+                display: block
+                margin-bottom: 0.5em
+        .append
+            &.open,
+            &.hint
+                @media (max-width: 1000px)
+                    margin-left: 0
+        .hint
+            margin-right: 1em
     .safety
         margin-right: 0.25em
         &.safety-safe

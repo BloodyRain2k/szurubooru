@@ -21,6 +21,7 @@ const fields = [
     "favoriteCount",
     "commentCount",
     "tags",
+    "flags",
     "version",
 ];
 
@@ -49,6 +50,7 @@ class PostListController {
             canBulkDelete: api.hasPrivilege("posts:bulk-edit:delete"),
             bulkEdit: {
                 tags: this._bulkEditTags,
+                flag: this._bulkEditFlag,
             },
         });
         this._headerView.addEventListener("navigate", (e) =>
@@ -76,6 +78,10 @@ class PostListController {
         return (this._ctx.parameters.tag || "").split(/\s+/).filter((s) => s);
     }
 
+    get _bulkEditFlag() {
+        return (this._ctx.parameters.flag || "")
+    }
+
     _evtNavigate(e) {
         router.showNoDispatch(
             uri.formatClientLink("posts", e.detail.parameters)
@@ -96,6 +102,18 @@ class PostListController {
         for (let tag of this._bulkEditTags) {
             e.detail.post.tags.removeByName(tag);
         }
+        e.detail.post.save().catch((error) => window.alert(error.message));
+    }
+
+    _evtFlag(e) {
+        if (e.detail.post.flags.indexOf(this._bulkEditFlag) == -1) {
+            e.detail.post.flags.push(this._bulkEditFlag);
+            e.detail.post.save().catch((error) => window.alert(error.message));
+        }
+    }
+
+    _evtUnFlag(e) {
+        e.detail.post.flags = e.detail.post.flags.filter(f => f != this._bulkEditFlag);
         e.detail.post.save().catch((error) => window.alert(error.message));
     }
 
@@ -160,12 +178,11 @@ class PostListController {
                 Object.assign(pageCtx, {
                     canViewPosts: api.hasPrivilege("posts:view"),
                     canBulkEditTags: api.hasPrivilege("posts:bulk-edit:tags"),
-                    canBulkEditSafety: api.hasPrivilege(
-                        "posts:bulk-edit:safety"
-                    ),
+                    canBulkEditSafety: api.hasPrivilege("posts:bulk-edit:safety"),
                     canBulkDelete: api.hasPrivilege("posts:bulk-edit:delete"),
                     bulkEdit: {
                         tags: this._bulkEditTags,
+                        flag: this._bulkEditFlag,
                         markedForDeletion: this._postsMarkedForDeletion,
                     },
                     imagesPerRow: parseInt(settings.get().imagesPerRow),
@@ -174,6 +191,8 @@ class PostListController {
                 const view = new PostsPageView(pageCtx);
                 view.addEventListener("tag", (e) => this._evtTag(e));
                 view.addEventListener("untag", (e) => this._evtUntag(e));
+                view.addEventListener("flag", (e) => this._evtFlag(e));
+                view.addEventListener("unflag", (e) => this._evtUnFlag(e));
                 view.addEventListener("changeSafety", (e) =>
                     this._evtChangeSafety(e)
                 );

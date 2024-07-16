@@ -46,6 +46,13 @@ class PostsPageView extends events.EventTarget {
                     this._evtBulkToggleDeleteClick(e, post)
                 );
             }
+
+            const flagFlipperNode = this._getFlagFlipperNode(listItemNode);
+            if (flagFlipperNode) {
+                flagFlipperNode.addEventListener("click", (e) =>
+                    this._evtBulkEditFlagsClick(e, post)
+                );
+            }
         }
 
         this._syncBulkEditorsHighlights();
@@ -65,6 +72,10 @@ class PostsPageView extends events.EventTarget {
 
     _getDeleteFlipperNode(listItemNode) {
         return listItemNode.querySelector(".delete-flipper");
+    }
+
+    _getFlagFlipperNode(listItemNode) {
+        return listItemNode.querySelector(".flag-flipper");
     }
 
     _evtPostChange(e) {
@@ -124,6 +135,23 @@ class PostsPageView extends events.EventTarget {
         );
     }
 
+    _evtBulkEditFlagsClick(e, post) {
+        e.preventDefault();
+        const linkNode = e.target;
+        if (linkNode.getAttribute("data-disabled")) {
+            return;
+        }
+        linkNode.setAttribute("data-disabled", true);
+        this.dispatchEvent(
+            new CustomEvent(
+                linkNode.classList.contains("flagged") ? "unflag" : "flag",
+                {
+                    detail: { post: post },
+                }
+            )
+        );
+    }
+
     _syncBulkEditorsHighlights() {
         for (let listItemNode of this._listItemNodes) {
             const postId = listItemNode.getAttribute("data-post-id");
@@ -157,6 +185,12 @@ class PostsPageView extends events.EventTarget {
                         (x) => x.id == postId
                     )
                 );
+            }
+
+            const flagFlipperNode = this._getFlagFlipperNode(listItemNode);
+            if (flagFlipperNode) {
+                let flagged = post.flags.indexOf(this._ctx.bulkEdit.flag) > -1;
+                flagFlipperNode.classList.toggle("flagged", flagged);
             }
         }
     }

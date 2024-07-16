@@ -42,19 +42,28 @@
             </section>
         <% } %>
 
-        <% if (ctx.canEditPostFlags && ctx.post.type === 'video') { %>
+        <% if (ctx.canEditPostFlags && (ctx.post.type === 'video' || ctx.canDeletePosts)) { %>
             <section class='flags'>
-                <label>Miscellaneous</label>
-                <%= ctx.makeCheckbox({
-                    text: 'Loop video',
-                    name: 'loop',
-                    checked: ctx.post.flags.includes('loop'),
-                }) %>
-                <%= ctx.makeCheckbox({
-                    text: 'Sound',
-                    name: 'sound',
-                    checked: ctx.post.flags.includes('sound'),
-                }) %>
+                <label>Flags</label>
+                <% if (ctx.post.type === 'video') { %>
+                    <%= ctx.makeCheckbox({
+                        text: 'Loop video',
+                        name: 'loop',
+                        checked: ctx.post.flags.includes('loop'),
+                    }) %>
+                    <%= ctx.makeCheckbox({
+                        text: 'Sound',
+                        name: 'sound',
+                        checked: ctx.post.flags.includes('sound'),
+                    }) %>
+                <% } %>
+                <% if (ctx.canDeletePosts) { %>
+                    <%= ctx.makeCheckbox({
+                        text: 'Flag as Deleted',
+                        name: 'delete',
+                        checked: ctx.post.flags.includes('delete'),
+                    }) %>
+                <% } %>
             </section>
         <% } %>
 
@@ -63,6 +72,7 @@
                 <%= ctx.makeTextarea({
                     text: 'Source',
                     value: ctx.post.source,
+                    rows: 4,
                 }) %>
             </section>
         <% } %>

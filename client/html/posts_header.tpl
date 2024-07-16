@@ -28,6 +28,16 @@
         %></form><%
     %><% } %><%
     %><% if (ctx.canBulkDelete) { %><%
+        %><form class='horizontal bulk-edit bulk-edit-flags'><%
+            %><span class='append hint'>Flagging with:</span><%
+            %><a href class='mousetrap button append open'>Mass flag</a><%
+            %><%= ctx.makeSelect({
+                text:'Flag', name: 'flag', keyValues: ctx.flags,
+                selectedKey: ctx.parameters.flag || '',
+            }) %><%
+            %><input class='mousetrap start' type='submit' value='Start flagging'/><%
+            %><a href class='mousetrap button append close'>Stop flagging</a><%
+        %></form><%
         %><form class='horizontal bulk-edit bulk-edit-delete'><%
             %><a href class='mousetrap button append open'>Mass delete</a><%
             %><input class='mousetrap start' type='submit' value='Delete selected posts'/><%
