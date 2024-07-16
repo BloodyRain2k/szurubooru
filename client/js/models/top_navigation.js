@@ -78,7 +78,7 @@ class TopNavigation extends events.EventTarget {
 
 function _makeTopNavigation() {
     const ret = new TopNavigation();
-    ret.add("home", new TopNavigationItem("B", "VISUABUSTERS", "/"));
+    ret.add("home", new TopNavigationItem("B", "Home", ""));
     ret.add("posts", new TopNavigationItem("P", "Posts", "posts"));
     ret.add("upload", new TopNavigationItem("U", "Upload", "upload"));
     ret.add("tags", new TopNavigationItem("T", "Tags", "tags"));
@@ -86,9 +86,9 @@ function _makeTopNavigation() {
     ret.add("users", new TopNavigationItem("S", "Users", "users"));
     ret.add("history", new TopNavigationItem("H", "History", "history"));
     ret.add("account", new TopNavigationItem("A", "Account", "user/{me}"));
-    ret.add("register", new TopNavigationItem("R", "Register", "/signup"));
-    ret.add("login", new TopNavigationItem("L", "Log in", "/login"));
-    ret.add("logout", new TopNavigationItem("O", "Logout", "/logout"));
+    ret.add("register", new TopNavigationItem("R", "Register", "register"));
+    ret.add("login", new TopNavigationItem("L", "Log in", "login"));
+    ret.add("logout", new TopNavigationItem("O", "Logout", "logout"));
     ret.add("help", new TopNavigationItem("E", "Help", "help"));
     ret.add(
         "settings",
