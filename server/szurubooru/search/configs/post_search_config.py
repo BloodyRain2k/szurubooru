@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional, Tuple, Callable, Union
 import sqlalchemy as sa
 
 from szurubooru import db, errors, model
-from szurubooru.func import util
+from szurubooru.func import util, posts
 from szurubooru.search import criteria, tokens
 from szurubooru.search.configs import util as search_util
 from szurubooru.search.configs.base_search_config import (
@@ -45,9 +45,8 @@ def _safety_transformer(value: str) -> str:
 
 def _flag_transformer(value: str) -> str:
     available_values = {
-        "loop": model.Post.FLAG_LOOP,
-        "sound": model.Post.FLAG_SOUND,
-        "tagme": model.Post.FLAG_TAGME,
+        v: k
+        for k, v in posts.FLAG_MAP.items()
     }
     return "%" + search_util.enum_transformer(available_values, value) + "%"
 
