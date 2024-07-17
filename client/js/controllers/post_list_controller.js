@@ -67,6 +67,8 @@ class PostListController {
         }
 
         this._postsMarkedForDeletion = [];
+        this._postUpdateQueue = [];
+        this._postUpdateQueueBusy = false;
         this._syncPageController();
     }
 
@@ -105,16 +107,43 @@ class PostListController {
         e.detail.post.save().catch((error) => window.alert(error.message));
     }
 
+    _queueUpdate(post) {
+        if (post) {
+            this._postUpdateQueue.push(post);
+            console.debug('queued:', post)
+        }
+        if (!this._postUpdateQueueBusy) {
+            this._postUpdateQueueBusy = true;
+            const nextPost = this._postUpdateQueue.shift();
+            if (nextPost) {
+                console.debug('saving:', nextPost);
+                nextPost.save().catch((error) => window.alert(error.message)).then(() => {
+                    this._postUpdateQueueBusy = false;
+                    console.debug('saved:', nextPost);
+                    this._queueUpdate();
+                });
+            }
+            else {
+                this._postUpdateQueueBusy = false;
+                console.debug('queue empty');
+            }
+        }
+    }
+
     _evtFlag(e) {
         if (e.detail.post.flags.indexOf(this._bulkEditFlag) == -1) {
             e.detail.post.flags.push(this._bulkEditFlag);
-            e.detail.post.save().catch((error) => window.alert(error.message));
+            // e.detail.post.save().catch((error) => window.alert(error.message));
+            this._queueUpdate(e.detail.post);
         }
     }
 
     _evtUnFlag(e) {
-        e.detail.post.flags = e.detail.post.flags.filter(f => f != this._bulkEditFlag);
-        e.detail.post.save().catch((error) => window.alert(error.message));
+        if (e.detail.post.flags.indexOf(this._bulkEditFlag) > -1) {
+            e.detail.post.flags = e.detail.post.flags.filter(f => f != this._bulkEditFlag);
+            // e.detail.post.save().catch((error) => window.alert(error.message));
+            this._queueUpdate(e.detail.post);
+        }
     }
 
     _evtChangeSafety(e) {
