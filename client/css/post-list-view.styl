@@ -215,7 +215,7 @@
             vertical-align: top
         @media (max-width: 1000px)
             display: block
-            &.bulk-edit-tags:not(.opened), &.bulk-edit-safety:not(.opened)
+            &.bulk-edit:not(.opened)
                 float: left
                 margin-right: 1em
     input
@@ -291,7 +291,7 @@
                     display: block
                     margin-bottom: 0.5em
         &:not(.opened)
-            select,
+            select[name=flag],
             .start
                 display: none
             .hint
