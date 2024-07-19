@@ -555,6 +555,7 @@ def create_post(
     new_tags = update_post_tags(post, tag_names)
 
     db.session.add(post)
+    fetch_disk_usage()
     return post, new_tags
 
 
@@ -654,6 +655,7 @@ def generate_alternate_formats(
         if len(new_relations) > 0:
             update_post_relations(post, new_relations)
 
+    fetch_disk_usage()
     return new_posts
 
 

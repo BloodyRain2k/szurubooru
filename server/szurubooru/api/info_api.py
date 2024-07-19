@@ -9,6 +9,8 @@ from szurubooru.func import auth, posts, users, util
 def get_info(ctx: rest.Context, _params: Dict[str, str] = {}) -> rest.Response:
     ret = {
         "postCount": posts.get_post_count(),
+        "diskUsage": posts.get_disk_usage(),
+        "diskUsageAvg": posts.get_disk_usage_avg(),
         "serverTime": datetime.utcnow(),
         "config": {
             "name": config.config["name"],
