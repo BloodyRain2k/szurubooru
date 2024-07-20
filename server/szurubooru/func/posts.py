@@ -81,8 +81,8 @@ def fetch_disk_usage():
     global _disk_usage, _disk_usage_avg
     _disk_usage, _disk_usage_avg = db.session.query(sa.func.sum(model.Post.file_size),
                                                     sa.func.avg(model.Post.file_size)).one()
-    _disk_usage = int(_disk_usage)
-    _disk_usage_avg = int(_disk_usage_avg)
+    _disk_usage = int(_disk_usage or 0)
+    _disk_usage_avg = int(_disk_usage_avg or 0)
 
 
 EMPTY_PIXEL = (
