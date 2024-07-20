@@ -400,6 +400,10 @@ class PostSearchConfig(BaseSearchConfig):
                 ),
                 (["pool"], _pool_filter),
                 (["category"], _category_filter),
+                (
+                    ["description"],
+                    search_util.create_str_filter(model.Post.description),
+                ),
             ]
         )
 
