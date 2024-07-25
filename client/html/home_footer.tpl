@@ -2,6 +2,8 @@
     <li><%- ctx.postCount %> posts</li>
     <span class='sep'>&nbsp;</span>
     <li><%= ctx.makeFileSize(ctx.diskUsage) %> (<%= ctx.makeFileSize(ctx.diskUsageAvg) %>)</li>
+    <span class='sep'>&nbsp;</span>
+    <li>Space left for ~<%= ctx.remainingAvg %> posts</li>
     <% if (ctx.version) { %>
         <span class='sep'>&nbsp;</span>
         <li>

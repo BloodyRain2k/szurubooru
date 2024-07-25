@@ -26,6 +26,7 @@ class HomeController {
                 postCount: api.getPostCount(),
                 diskUsage: api.getDiskUsage(),
                 diskUsageAvg: api.getDiskUsageAvg(),
+                remainingAvg: api.getRemainingAvg(),
             });
         });
         

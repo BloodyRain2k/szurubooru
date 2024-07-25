@@ -12,6 +12,7 @@ let remoteConfigPromise = null;
 let postCount = 0;
 let diskUsage = 0;
 let diskUsageAvg = 0;
+let remainingAvg = 0;
 let serverTime = "";
 
 class Api extends events.EventTarget {
@@ -81,6 +82,7 @@ class Api extends events.EventTarget {
                 postCount = response.postCount;
                 diskUsage = response.diskUsage;
                 diskUsageAvg = response.diskUsageAvg;
+                remainingAvg = response.remainingAvg;
                 serverTime = response.serverTime;
             });
             return remoteConfigPromise;
@@ -99,6 +101,10 @@ class Api extends events.EventTarget {
 
     getDiskUsageAvg() {
         return diskUsageAvg;
+    }
+
+    getRemainingAvg() {
+        return remainingAvg;
     }
 
     getServerTime() {
