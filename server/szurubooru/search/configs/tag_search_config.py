@@ -76,12 +76,7 @@ class TagSearchConfig(BaseSearchConfig):
                     search_util.create_date_filter(model.Tag.creation_time),
                 ),
                 (
-                    [
-                        "last-edit-date",
-                        "last-edit-time",
-                        "edit-date",
-                        "edit-time",
-                    ],
+                    ["last-edit-date", "last-edit-time", "edit-date", "edit-time"],
                     search_util.create_date_filter(model.Tag.last_edit_time),
                 ),
                 (
@@ -107,19 +102,20 @@ class TagSearchConfig(BaseSearchConfig):
                     ["random"],
                     (sa.sql.expression.func.random(), self.SORT_NONE),
                 ),
-                (["name"], (model.Tag.first_name, self.SORT_ASC)),
-                (["category"], (model.TagCategory.name, self.SORT_ASC)),
+                (
+                    ["name"],
+                    (model.Tag.first_name, self.SORT_ASC),
+                ),
+                (
+                    ["category"],
+                    (model.TagCategory.name, self.SORT_ASC),
+                ),
                 (
                     ["creation-date", "creation-time"],
                     (model.Tag.creation_time, self.SORT_DESC),
                 ),
                 (
-                    [
-                        "last-edit-date",
-                        "last-edit-time",
-                        "edit-date",
-                        "edit-time",
-                    ],
+                    ["last-edit-date", "last-edit-time", "edit-date", "edit-time"],
                     (model.Tag.last_edit_time, self.SORT_DESC),
                 ),
                 (

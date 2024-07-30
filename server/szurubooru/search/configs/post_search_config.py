@@ -250,7 +250,10 @@ class PostSearchConfig(BaseSearchConfig):
     def named_filters(self) -> Dict[str, Filter]:
         return util.unalias_dict(
             [
-                (["id"], search_util.create_num_filter(model.Post.post_id)),
+                (
+                    ["id"],
+                    search_util.create_num_filter(model.Post.post_id),
+                ),
                 (
                     ["tag"],
                     search_util.create_subquery_filter(
@@ -263,8 +266,14 @@ class PostSearchConfig(BaseSearchConfig):
                         ),
                     ),
                 ),
-                (["score"], search_util.create_num_filter(model.Post.score)),
-                (["uploader", "upload", "submit"], _user_filter),
+                (
+                    ["score"],
+                    search_util.create_num_filter(model.Post.score),
+                ),
+                (
+                    ["uploader", "upload", "submit"],
+                    _user_filter,
+                ),
                 (
                     ["comment"],
                     search_util.create_subquery_filter(
@@ -285,8 +294,14 @@ class PostSearchConfig(BaseSearchConfig):
                         lambda subquery: subquery.join(model.User),
                     ),
                 ),
-                (["liked"], _create_score_filter(1)),
-                (["disliked"], _create_score_filter(-1)),
+                (
+                    ["liked"],
+                    _create_score_filter(1),
+                ),
+                (
+                    ["disliked"],
+                    _create_score_filter(-1),
+                ),
                 (
                     ["source"],
                     search_util.create_str_filter(
@@ -359,12 +374,7 @@ class PostSearchConfig(BaseSearchConfig):
                     search_util.create_date_filter(model.Post.creation_time),
                 ),
                 (
-                    [
-                        "last-edit-date",
-                        "last-edit-time",
-                        "edit-date",
-                        "edit-time",
-                    ],
+                    ["last-edit-date", "last-edit-time", "edit-date", "edit-time"],
                     search_util.create_date_filter(model.Post.last_edit_time),
                 ),
                 (
@@ -391,15 +401,24 @@ class PostSearchConfig(BaseSearchConfig):
                         model.Post.safety, _safety_transformer
                     ),
                 ),
-                (["note-text"], _note_filter),
+                (
+                    ["note-text"],
+                    _note_filter,
+                ),
                 (
                     ["flag"],
                     search_util.create_str_filter(
                         model.Post.flags_string, _flag_transformer
                     ),
                 ),
-                (["pool"], _pool_filter),
-                (["category"], _category_filter),
+                (
+                    ["pool"],
+                    _pool_filter,
+                ),
+                (
+                    ["category"],
+                    _category_filter,
+                ),
                 (
                     ["description"],
                     search_util.create_str_filter(model.Post.description),
@@ -415,15 +434,30 @@ class PostSearchConfig(BaseSearchConfig):
                     ["random"],
                     (sa.sql.expression.func.random(), self.SORT_NONE),
                 ),
-                (["id"], (model.Post.post_id, self.SORT_DESC)),
-                (["score"], (model.Post.score, self.SORT_DESC)),
-                (["tag-count"], (model.Post.tag_count, self.SORT_DESC)),
+                (
+                    ["id"],
+                    (model.Post.post_id, self.SORT_DESC),
+                ),
+                (
+                    ["score"],
+                    (model.Post.score, self.SORT_DESC),
+                ),
+                (
+                    ["tag-count"],
+                    (model.Post.tag_count, self.SORT_DESC),
+                ),
                 (
                     ["comment-count"],
                     (model.Post.comment_count, self.SORT_DESC),
                 ),
-                (["fav-count"], (model.Post.favorite_count, self.SORT_DESC)),
-                (["note-count"], (model.Post.note_count, self.SORT_DESC)),
+                (
+                    ["fav-count"],
+                    (model.Post.favorite_count, self.SORT_DESC),
+                ),
+                (
+                    ["note-count"],
+                    (model.Post.note_count, self.SORT_DESC),
+                ),
                 (
                     ["relation-count"],
                     (model.Post.relation_count, self.SORT_DESC),
@@ -432,7 +466,10 @@ class PostSearchConfig(BaseSearchConfig):
                     ["feature-count"],
                     (model.Post.feature_count, self.SORT_DESC),
                 ),
-                (["file-size"], (model.Post.file_size, self.SORT_DESC)),
+                (
+                    ["file-size"],
+                    (model.Post.file_size, self.SORT_DESC),
+                ),
                 (
                     ["image-width", "width"],
                     (model.Post.canvas_width, self.SORT_DESC),
@@ -450,12 +487,7 @@ class PostSearchConfig(BaseSearchConfig):
                     (model.Post.creation_time, self.SORT_DESC),
                 ),
                 (
-                    [
-                        "last-edit-date",
-                        "last-edit-time",
-                        "edit-date",
-                        "edit-time",
-                    ],
+                    ["last-edit-date", "last-edit-time", "edit-date", "edit-time"],
                     (model.Post.last_edit_time, self.SORT_DESC),
                 ),
                 (
@@ -472,7 +504,7 @@ class PostSearchConfig(BaseSearchConfig):
                 ),
                 (
                     ["pool"],
-                    lambda subquery, order: _pool_sort(subquery, self.pool_id, order)
+                    lambda subquery, order: _pool_sort(subquery, self.pool_id, order),
                 )
             ]
         )

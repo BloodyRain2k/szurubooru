@@ -37,7 +37,10 @@ def get_directory(check: bool = None, get_min: bool = None):
     global _current_directory
     if not _current_directory:
         set_directory(db.session.execute(
-            f"SELECT {'min' if get_min else 'max'}(trim(LEADING '0' FROM {model.Post.directory.key})) FROM post"
+            "SELECT %s(trim(LEADING '0' FROM %s)) FROM post" % (
+                'min' if get_min else 'max',
+                model.Post.directory.key,
+            )
         ).fetchone()[0])
         dir_changed = True
     if check:
@@ -49,7 +52,7 @@ def get_directory(check: bool = None, get_min: bool = None):
             else:
                 break
     if dir_changed:
-        logger.info(f'> new post directory: "{_current_directory}"')
+        logger.info("> new post directory: \"%s\"", _current_directory)
     return _current_directory
 
 def get_next_directory():
