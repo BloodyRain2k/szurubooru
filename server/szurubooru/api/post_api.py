@@ -66,17 +66,23 @@ def create_post(
     tag_names = ctx.get_param_as_string_list("tags", default=[])
     safety = ctx.get_param_as_string("safety", default="unsafe")
     source = ctx.get_param_as_string("source", default="")
+    if ctx.has_param("sources"):
+        sources = []
+        for src in ctx.get_param_as_string_list("sources"):
+            if src and src not in sources:
+                sources.append(src)
+        source = "\n".join(sources)
     if ctx.has_param("contentUrl") and not source:
         source = ctx.get_param_as_string("contentUrl", default="")
     relations = ctx.get_param_as_int_list("relations", default=[])
-    try:
-        if ctx.get_param_as_bool("autoRelations", default=False):
+    if ctx.get_param_as_bool("autoRelations", default=False):
+        try:
             similar = posts.search_by_image(content)
             for sim_f, sim_p in similar:
                 if sim_p.post_id and sim_p.post_id not in relations:
                     relations.append(int(sim_p.post_id))
-    except Exception as ex:
-        pass
+        except Exception as ex:
+            pass
     notes = ctx.get_param_as_list("notes", default=[])
     flags = ctx.get_param_as_string_list(
         "flags", default=posts.get_default_flags(content)
@@ -164,6 +170,13 @@ def update_post(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
     if ctx.has_param("source"):
         auth.verify_privilege(ctx.user, "posts:edit:source")
         posts.update_post_source(post, ctx.get_param_as_string("source"))
+    if ctx.has_param("sources"):
+        auth.verify_privilege(ctx.user, "posts:edit:source")
+        sources = []
+        for src in ctx.get_param_as_string_list("sources"):
+            if src and src not in sources:
+                sources.append(src)
+        posts.update_post_source(post, "\n".join(sources))
     elif ctx.has_param("contentUrl"):
         posts.update_post_source(post, ctx.get_param_as_string("contentUrl"))
     if ctx.has_param("relations"):

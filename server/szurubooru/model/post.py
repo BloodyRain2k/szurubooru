@@ -308,7 +308,11 @@ class Post(Base):
 
     @sources.setter
     def sources(self, sources: List[str]) -> None:
-        self.source = "\n".join(set(sources))
+        new_sources = []
+        for src in sources:
+            if src and src not in new_sources:
+                new_sources.append(src)
+        self.source = "\n".join(new_sources)
 
     score = sa.orm.column_property(
         sa.sql.expression.select(

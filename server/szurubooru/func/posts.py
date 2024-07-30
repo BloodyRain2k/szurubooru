@@ -315,6 +315,7 @@ class PostSerializer(serialization.BaseSerializer):
             "pools": self.serialize_pools,
             "directory": self.serialize_directory,
             "tagNames": self.serialize_tag_names,
+            "sources": self.serialize_sources,
         }
 
     def serialize_id(self) -> Any:
@@ -334,6 +335,14 @@ class PostSerializer(serialization.BaseSerializer):
 
     def serialize_source(self) -> Any:
         return self.post.source
+
+    def serialize_sources(self) -> Any:
+        sources = []
+        for src in self.post.source.split("\n"):
+            if not src or src in sources:
+                continue
+            sources.append(src)
+        return sources
 
     def serialize_type(self) -> Any:
         return TYPE_MAP[self.post.type]
