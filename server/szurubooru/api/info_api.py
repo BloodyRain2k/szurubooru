@@ -8,6 +8,8 @@ from szurubooru.func import auth, posts, users, util
 @rest.routes.get("/info/?")
 def get_info(ctx: rest.Context, _params: Dict[str, str] = {}) -> rest.Response:
     avg = posts.get_disk_usage_avg()
+    if avg < 1:
+        avg = 1 * 1024**2
     statvfs = os.statvfs(config.config["data_dir"])
     # statvfs.f_frsize * statvfs.f_blocks     # Size of filesystem in bytes
     # statvfs.f_frsize * statvfs.f_bfree      # Actual number of free bytes
