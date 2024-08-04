@@ -517,6 +517,7 @@ class PostSearchConfig(BaseSearchConfig):
             "liked": self.noop_filter,
             "disliked": self.noop_filter,
             "tumbleweed": self.tumbleweed_filter,
+            "no-description": self.no_description_filter,
         }
 
     @property
@@ -547,6 +548,21 @@ class PostSearchConfig(BaseSearchConfig):
             (model.Post.comment_count == 0)
             & (model.Post.favorite_count == 0)
             & (model.Post.score == 0)
+        )
+        if negated:
+            expr = ~expr
+        return query.filter(expr)
+
+    def no_description_filter(
+        self,
+        query: SaQuery,
+        _criterion: Optional[criteria.BaseCriterion],
+        negated: bool,
+    ) -> SaQuery:
+        expr = (
+            (model.Post.description.is_(None))
+            # & (model.Post.favorite_count == 0)
+            # & (model.Post.score == 0)
         )
         if negated:
             expr = ~expr
