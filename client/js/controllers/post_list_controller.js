@@ -25,6 +25,8 @@ const fields = [
     "version",
 ];
 
+const postUpdateNum = 2;
+
 class PostListController {
     constructor(ctx) {
         this._pageController = new PageController();
@@ -68,7 +70,7 @@ class PostListController {
 
         this._postsMarkedForDeletion = [];
         this._postUpdateQueue = [];
-        this._postUpdateQueueBusy = false;
+        this._postUpdateActive = [];
         this._syncPageController();
     }
 
@@ -110,21 +112,20 @@ class PostListController {
     _queueUpdate(post) {
         if (post) {
             this._postUpdateQueue.push(post);
-            console.debug('queued:', post)
         }
-        if (!this._postUpdateQueueBusy) {
-            this._postUpdateQueueBusy = true;
+        if (this._postUpdateActive.length < postUpdateNum) {
             const nextPost = this._postUpdateQueue.shift();
             if (nextPost) {
-                console.debug('saving:', nextPost);
+                this._postUpdateActive.push(nextPost._id);
                 nextPost.save().catch((error) => window.alert(error.message)).then(() => {
-                    this._postUpdateQueueBusy = false;
-                    console.debug('saved:', nextPost);
+                    this._postUpdateActive = this._postUpdateActive.filter(id => id != nextPost._id);
                     this._queueUpdate();
                 });
+                if (this._postUpdateActive.length < postUpdateNum) {
+                    this._queueUpdate();
+                }
             }
             else {
-                this._postUpdateQueueBusy = false;
                 console.debug('queue empty');
             }
         }
