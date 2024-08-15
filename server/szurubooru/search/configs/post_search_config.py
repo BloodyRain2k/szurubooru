@@ -199,6 +199,8 @@ class PostSearchConfig(BaseSearchConfig):
         for token in search_query.named_tokens:
             if token.name == "pool" and isinstance(token.criterion, criteria.PlainCriterion):
                 self.pool_id = token.criterion.value
+        if "flag" not in [t.name for t in search_query.named_tokens]:
+            search_query.named_tokens.append(tokens.NamedToken("flag", criteria.PlainCriterion("delete"), True))
 
     def create_around_query(self) -> SaQuery:
         return db.session.query(model.Post).options(sa.orm.lazyload("*"))
