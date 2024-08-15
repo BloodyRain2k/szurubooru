@@ -24,6 +24,7 @@ class Context:
         self._headers = headers or {}
         self._params = params or {}
         self._files = files or {}
+        self._perf = -1.0
 
         self.user = model.User()
         self.user.name = None
