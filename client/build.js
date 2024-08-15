@@ -104,6 +104,9 @@ function bundleHtml() {
         const name = path.basename(file, '.tpl').replace(/_/g, '-');
         const placeholders = [];
         let templateText = readTextFile(file);
+        if (templateText.indexOf('?.') > -1) {
+            throw { message: `File "${file}" contains "?."` }
+        }
         templateText = templateText.replace(
             /<%.*?%>/ig,
             (match) => {
@@ -160,7 +163,7 @@ function minifyJs(path) {
 
 function writeJsBundle(b, path, compress, callback) {
     let outputFile = fs.createWriteStream(path);
-    b.bundle().on('error', (e) => console.error(pe.render(e))).pipe(outputFile);
+    b.bundle().pipe(outputFile);
     outputFile.on('finish', () => {
         if (compress) {
             fs.writeFileSync(path, minifyJs(path));
