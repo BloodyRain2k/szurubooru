@@ -20,7 +20,7 @@ const fields = [
     "score",
     "favoriteCount",
     "commentCount",
-    "tags",
+    // "tags",
     "flags",
     "version",
 ];
@@ -183,6 +183,19 @@ class PostListController {
         }
     }
 
+    _evtPostEnter(e) {
+        const post = e.detail.post;
+        if (post.tags.length > 0) {
+            return;
+        }
+        api.get(uri.formatApiLink("post", post.id, { fields: "tagNames" })).then(response => {
+            for (const tag of response.tagNames) {
+                post.tags.addByName(tag);
+            }
+            e.detail.element.title += "\n\n" + post.tagNames.join(" ");
+        });
+    }
+
     _syncPageController() {
         this._pageController.run({
             parameters: this._ctx.parameters,
@@ -228,6 +241,7 @@ class PostListController {
                 view.addEventListener("markForDeletion", (e) =>
                     this._evtMarkForDeletion(e)
                 );
+                view.addEventListener("postEnter", (e) => this._evtPostEnter(e));
                 return view;
             },
         });

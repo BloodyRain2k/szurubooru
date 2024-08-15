@@ -24,6 +24,9 @@ class PostsPageView extends events.EventTarget {
             const post = this._postIdToPost[postId];
             this._postIdToListItemNode[postId] = listItemNode;
 
+            listItemNode.addEventListener("mouseenter", (e) => 
+                this._evtMouseEnter(e, post, listItemNode.firstElementChild))
+
             const tagFlipperNode = this._getTagFlipperNode(listItemNode);
             if (tagFlipperNode) {
                 tagFlipperNode.addEventListener("click", (e) =>
@@ -84,6 +87,17 @@ class PostsPageView extends events.EventTarget {
             node.removeAttribute("data-disabled");
         }
         this._syncBulkEditorsHighlights();
+    }
+
+    _evtMouseEnter(e, post, element) {
+        this.dispatchEvent(
+            new CustomEvent(
+                "postEnter",
+                {
+                    detail: { post: post, element: element },
+                }
+            )
+        );
     }
 
     _evtBulkEditTagsClick(e, post) {
