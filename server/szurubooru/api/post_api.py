@@ -5,6 +5,7 @@ from szurubooru import db, errors, model, rest, search
 from szurubooru.func import (
     auth,
     favorites,
+    net,
     posts,
     scores,
     serialization,
@@ -336,14 +337,7 @@ def get_pools_around(
     return posts.serialize_pool_posts_nearby(results)
 
 
-
-@rest.routes.post("/posts/reverse-search/?")
-def get_posts_by_image(
-    ctx: rest.Context, _params: Dict[str, str] = {}
-) -> rest.Response:
-    auth.verify_privilege(ctx.user, "posts:reverse_search")
-    content = ctx.get_file("content")
-
+def get_posts_by_content(ctx: rest.Context, content):
     try:
         lookalikes = posts.search_by_image(content)
     except (errors.ThirdPartyError, errors.ProcessingError):
@@ -361,3 +355,32 @@ def get_posts_by_image(
             for distance, post in lookalikes
         ],
     }
+
+@rest.routes.post("/posts/reverse-search/?")
+def get_posts_by_image(
+    ctx: rest.Context, _params: Dict[str, str] = {}
+) -> rest.Response:
+    auth.verify_privilege(ctx.user, "posts:reverse_search")
+    if ctx.has_param("contentUrl"):
+        try:
+            urls = [ctx.get_param_as_string("contentUrl")]
+        except:
+            urls = ctx.get_param_as_list("contentUrl")
+        result = {}
+        for url in urls:
+            sub_urls = [url]
+            if isinstance(url, list):
+                sub_urls = url
+            for sub in sub_urls:
+                try:
+                    content = net.download(sub)
+                    result[sub] = res = get_posts_by_content(ctx, content)
+                    if res["similarPosts"].__len__() == 0:
+                        break
+                except Exception as ex:
+                    result[sub] = str(ex)
+                    break
+        return result
+
+    content = ctx.get_file("content")
+    return get_posts_by_content(ctx, content)
