@@ -81,7 +81,9 @@ take following form:</p>
 by negating the whole token.</p>
 
 <p>You can escape special characters such as <code>:</code> and <code>-</code>
-by prepending them with a backslash: <code>\\</code>.</p>
+by prepending them with a backslash: <code>\</code>. If you need a space, for
+example when searching in the source field, you can escaping an
+underscore: <code>source:\_</code>.</p>
 
 <h1>Example</h1>
 

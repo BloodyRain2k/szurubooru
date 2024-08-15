@@ -25,11 +25,13 @@ def unescape(text: str, make_wildcards_special: bool = False) -> str:
                     "Unterminated escape sequence (did you forget to escape "
                     "the ending backslash?)"
                 )
-            if char not in "*\\:-.,":
+            if char not in "*\\:-.,_":
                 raise errors.SearchError(
                     "Unknown escape sequence (did you forget to escape "
                     "the backslash?)"
                 )
+            if char == "_":
+                char = " "
         elif text[i] == "*" and make_wildcards_special:
             char = WILDCARD
         else:
