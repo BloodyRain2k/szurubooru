@@ -439,7 +439,7 @@ class PostSerializer(serialization.BaseSerializer):
         return self.post.favorite_count
 
     def serialize_comment_count(self) -> Any:
-        return 0
+        return self.post.comment_count
 
     def serialize_note_count(self) -> Any:
         return self.post.note_count
@@ -448,7 +448,7 @@ class PostSerializer(serialization.BaseSerializer):
         return self.post.relation_count
 
     def serialize_feature_count(self) -> Any:
-        return 0
+        return self.post.feature_count
 
     def serialize_last_feature_time(self) -> Any:
         return None
@@ -470,7 +470,10 @@ class PostSerializer(serialization.BaseSerializer):
         )
 
     def serialize_comments(self) -> Any:
-        return []
+        return [
+            comments.serialize_comment(comment, self.auth_user)
+            for comment in self.post.comments
+        ]
 
     def serialize_pools(self) -> List[Any]:
         return [
