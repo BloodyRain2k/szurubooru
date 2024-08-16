@@ -27,9 +27,9 @@ class RangedCriterion(BaseCriterion):
 
 
 class PlainCriterion(BaseCriterion):
-    def __init__(self, original_text: str, value: str) -> None:
+    def __init__(self, original_text: str, value: Optional[str] = None) -> None:
         super().__init__(original_text)
-        self.value = value
+        self.value = value or original_text
 
     def __hash__(self) -> int:
         return hash(self.value)
