@@ -931,7 +931,7 @@ def update_post_flags(post: model.Post, flags: List[str], remove: bool = False) 
     assert post
     target_flags = []
     for flag in flags:
-        if remove and flag == model.Post.FLAG_TAGME:
+        if remove and flag == model.Post.FLAG_TAGME and post.tags.__len__() > 0:
             continue
         flag = util.flip(FLAG_MAP).get(flag, None)
         if not flag:

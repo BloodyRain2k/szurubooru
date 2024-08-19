@@ -3,7 +3,7 @@
         <ul class='ipr<%= ctx.imagesPerRow || 7 %> iprm<%= ctx.imagesPerRowMobile || 2 %>'>
             <% for (let post of ctx.response.results) { %>
                 <li data-post-id='<%= post.id %>'>
-                    <a class='thumbnail-wrapper <%= !ctx.canBulkEditTags || post.tags.length > 0 ? "tags" : "no-tags" %>'
+                    <a class='thumbnail-wrapper <%= !ctx.canBulkEditTags || post.flags.indexOf("tagme") == -1 ? "tags" : "no-tags" %>'
                             title='@<%- post.id %> (<%- post.type %>)'
                             href='<%= ctx.canViewPosts ? ctx.getPostUrl(post.id, ctx.parameters) : '' %>'>
                         <%= ctx.makeThumbnail(post.thumbnailUrl) %>
