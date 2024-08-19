@@ -363,9 +363,9 @@ def get_posts_by_image(
     auth.verify_privilege(ctx.user, "posts:reverse_search")
     if ctx.has_param("contentUrl"):
         try:
-            urls = [ctx.get_param_as_string("contentUrl")]
-        except:
             urls = ctx.get_param_as_list("contentUrl")
+        except:
+            urls = [ctx.get_param_as_string("contentUrl")]
         result = {}
         for url in urls:
             sub_urls = [url]

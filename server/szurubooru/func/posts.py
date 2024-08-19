@@ -1138,13 +1138,13 @@ def search_by_image(image_content: bytes) -> List[Tuple[float, model.Post]]:
     if data:
         candidate_post_ids, sigarray = data
         distances = image_hash.normalized_distance(sigarray, query_signature)
-        return [
+        return sorted([
             (distance, try_get_post_by_id(candidate_post_id))
             for candidate_post_id, distance in zip(
                 candidate_post_ids, distances
             )
             if distance < image_hash.DISTANCE_CUTOFF
-        ]
+        ], key = lambda item: item[0])
     else:
         return []
 
