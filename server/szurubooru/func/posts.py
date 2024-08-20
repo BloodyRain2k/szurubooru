@@ -338,10 +338,11 @@ class PostSerializer(serialization.BaseSerializer):
 
     def serialize_sources(self) -> Any:
         sources = []
-        for src in self.post.source.split("\n"):
-            if not src or src in sources:
-                continue
-            sources.append(src)
+        if self.post.source:
+            for src in self.post.source.split("\n"):
+                if not src or src in sources:
+                    continue
+                sources.append(src)
         return sources
 
     def serialize_type(self) -> Any:
