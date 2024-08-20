@@ -92,6 +92,8 @@ def create_post(
     post, new_tags = posts.create_post(
         content, tag_names, None if anonymous else ctx.user
     )
+    if tag_names.__len__() > 0 and flags.count(model.Post.FLAG_TAGME) > 0:
+        flags.remove(model.Post.FLAG_TAGME)
     if len(new_tags):
         auth.verify_privilege(ctx.user, "tags:create")
     posts.update_post_safety(post, safety)
