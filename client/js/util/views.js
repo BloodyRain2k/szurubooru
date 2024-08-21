@@ -29,6 +29,11 @@ function makeFileSize(fileSize) {
 }
 
 function makeMarkdown(text) {
+    if (text.startsWith("{\n") && text.endsWith("\n}")) {
+        text = text.split("\n")
+                   .map(l => `\t${l}`)
+                   .join("\n");
+    }
     return misc.formatMarkdown(text);
 }
 
