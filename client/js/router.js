@@ -157,7 +157,7 @@ class Router {
         window.addEventListener("popstate", this._onPopState, false);
         document.addEventListener(clickEvent, this._onClick, false);
         const url = location.pathname + location.search + location.hash;
-        return this.replace(url, history.state, true);
+        return this.replace(url.replace('//', '/'), history.state, true);
     }
 
     stop() {
