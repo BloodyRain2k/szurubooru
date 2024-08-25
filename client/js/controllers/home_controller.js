@@ -31,7 +31,9 @@ class HomeController {
         });
         
         api.get(uri.formatApiLink("featured-post")).then((response) => {
-            this._homeView.setFeaturedPost({ featuredPost: Post.fromResponse(response) });
+            if (response) {
+                this._homeView.setFeaturedPost({ featuredPost: Post.fromResponse(response) });
+            }
         })
     }
 
