@@ -114,6 +114,18 @@ def _note_filter(
     )(query, criterion, negated)
 
 
+def _comment_filter(
+    query: SaQuery, criterion: Optional[criteria.BaseCriterion], negated: bool
+) -> SaQuery:
+    assert criterion
+    return search_util.create_subquery_filter(
+        model.Post.post_id,
+        model.Comment.post_id,
+        model.Comment.text,
+        search_util.create_str_filter,
+    )(query, criterion, negated)
+
+
 def _pool_filter(
     query: SaQuery, criterion: Optional[criteria.BaseCriterion], negated: bool
 ) -> SaQuery:
@@ -406,6 +418,10 @@ class PostSearchConfig(BaseSearchConfig):
                 (
                     ["note-text"],
                     _note_filter,
+                ),
+                (
+                    ["comment-text"],
+                    _comment_filter,
                 ),
                 (
                     ["flag"],
