@@ -16,7 +16,9 @@ depends_on = None
 def upgrade():
     op.execute('CREATE EXTENSION IF NOT EXISTS pg_trgm')
     op.execute('CREATE INDEX idx_post_source_gin ON post USING gin (source gin_trgm_ops)')
+    op.execute('CREATE INDEX idx_tag_name_gin ON tag_name USING gin (name gin_trgm_ops)')
 
 def downgrade():
     op.execute('DROP INDEX idx_post_source_gin')
+    op.execute('DROP INDEX idx_tag_name_gin')
     op.execute('DROP EXTENSION pg_trgm')
