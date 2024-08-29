@@ -34,7 +34,9 @@ $comment-border-color = #DDD
         border: 1px solid $comment-border-color
 
         header
-            white-space: nowrap
+            @media (min-width:1024px)
+                white-space: nowrap
+
             font-size: 95%
             vertical-align: middle
             position: relative
