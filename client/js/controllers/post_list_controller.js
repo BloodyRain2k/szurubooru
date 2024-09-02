@@ -173,9 +173,14 @@ class PostListController {
                 `Are you sure you want to delete ${this._postsMarkedForDeletion.length} posts?`
             )
         ) {
-            Promise.all(
-                this._postsMarkedForDeletion.map((post) => post.delete())
-            )
+            const prom = async () => {
+                const posts = this._postsMarkedForDeletion.map((post) => post);
+                for (const post of posts) {
+                    await post.delete();
+                }
+                return Promise.resolve();
+            };
+            prom()
                 .catch((error) => window.alert(error.message))
                 .then(() => {
                     this._postsMarkedForDeletion = [];
