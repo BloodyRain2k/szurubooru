@@ -48,6 +48,8 @@ def _flag_transformer(value: str) -> str:
         v: k
         for k, v in posts.FLAG_MAP.items()
     }
+    if value == "*":
+        return "%"
     return "%" + search_util.enum_transformer(available_values, value) + "%"
 
 
@@ -323,23 +325,23 @@ class PostSearchConfig(BaseSearchConfig):
                     ),
                 ),
                 (
-                    ["tag-count"],
+                    ["tag-count", "tags"],
                     search_util.create_num_filter(model.Post.tag_count),
                 ),
                 (
-                    ["comment-count"],
+                    ["comment-count", "comments"],
                     search_util.create_num_filter(model.Post.comment_count),
                 ),
                 (
-                    ["fav-count"],
+                    ["fav-count", "favs"],
                     search_util.create_num_filter(model.Post.favorite_count),
                 ),
                 (
-                    ["note-count"],
+                    ["note-count", "notes"],
                     search_util.create_num_filter(model.Post.note_count),
                 ),
                 (
-                    ["relation-count"],
+                    ["relation-count", "relations"],
                     search_util.create_num_filter(model.Post.relation_count),
                 ),
                 (
@@ -438,7 +440,7 @@ class PostSearchConfig(BaseSearchConfig):
                     _category_filter,
                 ),
                 (
-                    ["description"],
+                    ["description", "desc"],
                     search_util.create_str_filter(model.Post.description),
                 ),
             ]
