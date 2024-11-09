@@ -49,8 +49,8 @@ def download(url: str, use_downloader: bool = False) -> bytes:
         with urllib.request.urlopen(request) as handle:
             if int(handle.headers.get('content-length', -1)) > config.config["max_dl_filesize"]:
                 raise DownloadTooLargeError(
-                    "Download target exceeds maximum. (%d) vs (%s)"
-                    % (config.config["max_dl_filesize"], handle.headers.get('content-length', -1)),
+                    "Download target exceeds maximum. (%s) vs (%d)"
+                    % (handle.headers.get('content-length', -1), config.config["max_dl_filesize"]),
                     extra_fields={"URL": url},
                 )
             while chunk := handle.read(_dl_chunk_size):
