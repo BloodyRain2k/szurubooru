@@ -1079,7 +1079,7 @@ def merge_posts(
     def merge_sources(source_post_id: int, target_post_id: int) -> None:
         target = get_post_by_id(target_post_id)
         source = get_post_by_id(source_post_id)
-        target.sources = target.sources + source.sources
+        target.sources = target.sources + [src for src in source.sources if src not in target.sources]
         db.session.flush()
 
     content = None
