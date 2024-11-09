@@ -70,6 +70,13 @@ def set_directory(new_dir: Union[str,int]):
     return new_dir
 
 
+def fetch_disk_usage():
+    global _disk_usage, _disk_usage_avg
+    _disk_usage, _disk_usage_avg = db.session.query(sa.func.sum(model.Post.file_size),
+                                                    sa.func.avg(model.Post.file_size)).one()
+    _disk_usage = int(_disk_usage or 0)
+    _disk_usage_avg = int(_disk_usage_avg or 0)
+
 def get_disk_usage():
     if _disk_usage < 0:
         fetch_disk_usage()
@@ -79,13 +86,6 @@ def get_disk_usage_avg():
     if _disk_usage_avg < 0:
         fetch_disk_usage()
     return _disk_usage_avg
-
-def fetch_disk_usage():
-    global _disk_usage, _disk_usage_avg
-    _disk_usage, _disk_usage_avg = db.session.query(sa.func.sum(model.Post.file_size),
-                                                    sa.func.avg(model.Post.file_size)).one()
-    _disk_usage = int(_disk_usage or 0)
-    _disk_usage_avg = int(_disk_usage_avg or 0)
 
 
 EMPTY_PIXEL = (

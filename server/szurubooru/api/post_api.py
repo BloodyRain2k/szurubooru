@@ -60,9 +60,10 @@ def create_post(
         auth.verify_privilege(ctx.user, "posts:create:identified")
     content = ctx.get_file(
         "content",
-        use_downloader=auth.has_privilege(
-            ctx.user, "uploads:use_downloader"
-        ) and (ctx.get_param_as_bool("useDownloader", True)),
+        use_downloader = (
+            auth.has_privilege(ctx.user, "uploads:use_downloader")
+            and (ctx.get_param_as_bool("useDownloader", True))
+        ),
     )
     tag_names = ctx.get_param_as_string_list("tags", default=[])
     safety = ctx.get_param_as_string("safety", default="unsafe")

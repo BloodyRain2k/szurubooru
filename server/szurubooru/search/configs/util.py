@@ -27,8 +27,8 @@ def unescape(text: str, make_wildcards_special: bool = False) -> str:
                 )
             if char not in "*\\:-.,_":
                 raise errors.SearchError(
-                    "Unknown escape sequence (did you forget to escape "
-                    "the backslash?)"
+                    "Unknown escape sequence: '%s' (did you forget to escape "
+                    "the backslash?)" % (char)
                 )
             if char == "_":
                 char = " "
