@@ -29,7 +29,7 @@ def _docker_config() -> Dict:
                     f'Environment variable "{key}" not set'
                 )
     return {
-        "debug": True,
+        "debug": False,
         "show_sql": int(os.getenv("LOG_SQL", 0)),
         "data_url": os.getenv("DATA_URL", "data/"),
         "data_dir": "/data/",

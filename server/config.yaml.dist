@@ -21,6 +21,11 @@ thumbnails:
     post_filename_prefix: ''
     post_filename_suffix: ''
 
+posts:
+    use_directories: true
+    directory_padding: 4
+    posts_per_directory: 1000
+
 # settings used to download files from the web on behalf of the api users
 user_agent:
 max_dl_filesize: 25.0E+6 # maximum filesize limit in bytes

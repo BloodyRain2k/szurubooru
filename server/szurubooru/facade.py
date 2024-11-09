@@ -3,7 +3,6 @@ import os
 import threading
 import time
 from typing import Any, Callable, Type
-import debugpy
 
 import coloredlogs
 import sqlalchemy as sa
@@ -138,15 +137,24 @@ _live_migrations = (
 def create_app() -> Callable[[Any, Any], Any]:
     """Create a WSGI compatible App object."""
     validate_config()
-    coloredlogs.install(fmt="[%(asctime)-15s] %(name)s %(message)s")
-    if config.config["debug"]:
+    coloredlogs.install(fmt="[%(asctime)-15s] [%(name)s] %(message)s")
+    if config.config.get("debug") or config.config.get("debug_wait") \
+            or os.environ.get("DEBUG") or os.environ.get("WAIT_DEBUG"):
         logger = logging.getLogger("szurubooru")
         logger.setLevel(logging.INFO)
-        debugpy.listen(("0.0.0.0", 5678))
-        if config.config.get("debug_wait"):
-            logger.info("Waiting for debugger attach...")
-            debugpy.wait_for_client()  # Pause the program until a remote debugger is attached
-            logger.info("Debugger attached, starting execution...")
+        if "debugpy" not in dir():
+            import debugpy
+            debugpy.listen(("0.0.0.0", 5678))
+            logger.info(f"Started debugpy on port 5678")
+            if config.config.get("debug_wait") or os.environ.get("WAIT_DEBUG"):
+                logger.info("Waiting for debugger attach...")
+                debugpy.wait_for_client()  # Pause the program until a remote debugger is attached
+                logger.info("Debugger attached, starting execution...")
+            else:
+                for i in range(20):
+                    time.sleep(0.1)
+                    if debugpy.is_client_connected():
+                        break
 
     if config.config["show_sql"]:
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
