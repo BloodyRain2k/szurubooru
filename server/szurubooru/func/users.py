@@ -110,6 +110,7 @@ class UserSerializer(serialization.BaseSerializer):
 
     def _serializers(self) -> Dict[str, Callable[[], Any]]:
         return {
+            "id": self.serialize_id,
             "name": self.serialize_name,
             "creationTime": self.serialize_creation_time,
             "lastLoginTime": self.serialize_last_login_time,
@@ -124,6 +125,9 @@ class UserSerializer(serialization.BaseSerializer):
             "dislikedPostCount": self.serialize_disliked_post_count,
             "email": self.serialize_email,
         }
+
+    def serialize_id(self) -> Any:
+        return self.user.user_id
 
     def serialize_name(self) -> Any:
         return self.user.name
