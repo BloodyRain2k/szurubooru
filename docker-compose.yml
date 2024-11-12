@@ -9,6 +9,7 @@ services:
   server:
     container_name: sz_server
     image: szurubooru/server:latest
+    restart: unless-stopped
     depends_on:
       - sql
     environment:
@@ -23,20 +24,35 @@ services:
       #POSTGRES_PORT: 5432
       #LOG_SQL: 0 (1 for verbose SQL logs)
       THREADS:
+      DEBUG: 1
+      # WAIT_DEBUG: 1
+      HUPPER: 1
+      NO_UPGRADE: 1
+      # DOWNGRADE: 236a
+    logging:
+      # driver: "json-file"
+      options:
+        max-size: "80m"
     volumes:
       - "${MOUNT_DATA}:/data"
       - "./server/config.yaml:/opt/app/config.yaml"
+      - "./server/szurubooru:/opt/app/szurubooru"
     ports:
       - "56789:5678"
 
   client:
     container_name: sz_client
     image: szurubooru/client:latest
+    restart: unless-stopped
     depends_on:
       - server
     environment:
       BACKEND_HOST: server
       BASE_URL:
+    logging:
+      # driver: "json-file"
+      options:
+        max-size: "80m"
     volumes:
       - "${MOUNT_DATA}:/data:ro"
     ports:
@@ -49,5 +65,9 @@ services:
     environment:
       POSTGRES_USER:
       POSTGRES_PASSWORD:
+    logging:
+      # driver: "json-file"
+      options:
+        max-size: "80m"
     volumes:
       - "${MOUNT_SQL}:/var/lib/postgresql/data"
