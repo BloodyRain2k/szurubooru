@@ -90,9 +90,23 @@ def create_post(
         "flags", default=posts.get_default_flags(content)
     )
 
-    post, new_tags = posts.create_post(
-        content, tag_names, None if anonymous else ctx.user
-    )
+    merge_sources = ctx.get_param_as_bool("mergeSources", default=False)
+    try:
+        post, new_tags = posts.create_post(
+            content, tag_names, None if anonymous else ctx.user
+        )
+    except Exception as ex:
+        if merge_sources and hasattr(ex, "extra_fields") and "otherPostId" in ex.extra_fields:
+            other_post_id = ex.extra_fields.get("otherPostId")
+            other_post = posts.get_post_by_id(other_post_id)
+            new_sources = [s for s in source.split("\n") if s and s not in other_post.sources]
+            if new_sources:
+                other_post.sources += new_sources
+                ctx.session.flush()
+                ctx.session.commit()
+                ex.extra_fields["mergedSources"] = True
+        raise ex
+
     if tag_names.__len__() > 0 and flags.count(model.Post.FLAG_TAGME) > 0:
         flags.remove(model.Post.FLAG_TAGME)
     if len(new_tags):
