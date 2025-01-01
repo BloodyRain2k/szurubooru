@@ -29,10 +29,16 @@ function makeFileSize(fileSize) {
 }
 
 function makeMarkdown(text) {
-    if (text.startsWith("{\n") && text.endsWith("\n}")) {
-        text = text.split("\n")
-                   .map(l => `\t${l}`)
-                   .join("\n");
+    if (text.startsWith("{") && text.endsWith("}")) {
+        try {
+            let formatted = JSON.stringify(JSON.parse(text), null, 2);
+            let elem = document.createElement('pre');
+            elem.textContent = formatted;
+            return elem.outerHTML;
+        }
+        catch (ex) {
+            console.error(ex);
+        }
     }
     return misc.formatMarkdown(text);
 }
