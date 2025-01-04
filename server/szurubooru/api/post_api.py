@@ -66,7 +66,7 @@ def create_post(
         ),
     )
     tag_names = ctx.get_param_as_string_list("tags", default=[])
-    safety = ctx.get_param_as_string("safety", default="unsafe")
+    safety = ctx.get_param_as_string("safety", default="unknown")
     source = ctx.get_param_as_string("source", default="")
     if ctx.has_param("sources"):
         sources = []

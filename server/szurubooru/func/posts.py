@@ -158,6 +158,7 @@ SAFETY_MAP = {
     model.Post.SAFETY_SAFE: "safe",
     model.Post.SAFETY_SKETCHY: "sketchy",
     model.Post.SAFETY_UNSAFE: "unsafe",
+    model.Post.SAFETY_UNKNOWN: "unknown",
 }
 
 TYPE_MAP = {
@@ -270,8 +271,11 @@ class PostSerializer(serialization.BaseSerializer):
         if options and "safety" not in options:
             options.append("safety")
         serial = super().serialize(options)
-        if serial.get("safety", "unsafe") == SAFETY_MAP[model.Post.SAFETY_UNSAFE] and not auth.has_privilege(self.auth_user, "posts:view:unsafe"):
-            return
+        if self.auth_user != None:
+            if serial.get("safety", "unknown") in [SAFETY_MAP[model.Post.SAFETY_UNSAFE],
+                                                   SAFETY_MAP[model.Post.SAFETY_UNKNOWN]] \
+            and not auth.has_privilege(self.auth_user, "posts:view:unsafe"):
+                return
         return serial
 
     def _serializers(self) -> Dict[str, Callable[[], Any]]:

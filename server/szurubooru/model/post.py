@@ -187,8 +187,9 @@ class Post(Base):
     __tablename__ = "post"
 
     SAFETY_SAFE = "safe"
-    SAFETY_SKETCHY = "sketchy"
-    SAFETY_UNSAFE = "unsafe"
+    SAFETY_SKETCHY = "questionable"
+    SAFETY_UNSAFE = "explicit"
+    SAFETY_UNKNOWN = "unknown"
 
     TYPE_IMAGE = "image"
     TYPE_ANIMATION = "animation"
