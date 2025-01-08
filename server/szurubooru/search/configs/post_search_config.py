@@ -380,6 +380,13 @@ class PostSearchConfig(BaseSearchConfig):
                     search_util.create_num_filter(model.Post.canvas_area),
                 ),
                 (
+                    ["image-density", "density"],
+                    search_util.create_num_filter(
+                        model.Post.canvas_density,
+                        transformer=search_util.float_transformer,
+                    ),
+                ),
+                (
                     ["image-aspect-ratio", "image-ar", "aspect-ratio", "ar"],
                     search_util.create_num_filter(
                         model.Post.canvas_aspect_ratio,
@@ -502,6 +509,10 @@ class PostSearchConfig(BaseSearchConfig):
                 (
                     ["image-area", "area"],
                     (model.Post.canvas_area, self.SORT_DESC),
+                ),
+                (
+                    ["image-density", "density"],
+                    (model.Post.canvas_density, self.SORT_DESC),
                 ),
                 (
                     ["creation-date", "creation-time", "date", "time"],

@@ -284,6 +284,10 @@ class Post(Base):
         sa.sql.expression.func.cast(canvas_width, sa.Float)
         / sa.sql.expression.func.cast(canvas_height, sa.Float)
     )
+    canvas_density = sa.orm.column_property(
+        sa.sql.expression.func.cast(file_size, sa.Float)
+        / sa.sql.expression.func.cast(canvas_area, sa.Float)
+    )
 
     @property
     def is_featured(self) -> bool:

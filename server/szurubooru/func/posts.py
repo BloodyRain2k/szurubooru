@@ -293,6 +293,7 @@ class PostSerializer(serialization.BaseSerializer):
             "fileSize": self.serialize_file_size,
             "canvasWidth": self.serialize_canvas_width,
             "canvasHeight": self.serialize_canvas_height,
+            "canvasDensity": self.serialize_canvas_density,
             "contentUrl": self.serialize_content_url,
             "thumbnailUrl": self.serialize_thumbnail_url,
             "customThumbnailUrl": self.serialize_custom_thumbnail_url,
@@ -369,6 +370,9 @@ class PostSerializer(serialization.BaseSerializer):
 
     def serialize_canvas_height(self) -> Any:
         return self.post.canvas_height
+
+    def serialize_canvas_density(self) -> Any:
+        return self.post.canvas_density
 
     def serialize_content_url(self) -> Any:
         return get_post_content_url(self.post)
