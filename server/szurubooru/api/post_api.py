@@ -240,6 +240,28 @@ def delete_post(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
     return {}
 
 
+@rest.routes.post("/sources/?")
+def source_lookup(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
+    sources = ctx.get_param_as_string_list("sources")
+    found = posts.search_by_source(sources)
+    result = {
+        "by_id": {},
+        "by_source": {},
+        "unknown": [],
+    }
+    for res in found:
+        r_id = res[0]
+        r_sources = res[1].split("\n")
+        result["by_id"][r_id] = r_sources
+        for src in r_sources:
+            if src not in result["by_source"]:
+                result["by_source"][src] = []
+            if src not in result["by_source"][src]:
+                result["by_source"][src].append(r_id)
+    result["unknown"] = [s for s in sources if s not in result["by_source"]]
+    return result
+
+
 @rest.routes.post("/post-merge/?")
 def merge_posts(
     ctx: rest.Context, _params: Dict[str, str] = {}

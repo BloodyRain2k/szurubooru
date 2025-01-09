@@ -1158,6 +1158,20 @@ def search_by_image(image_content: bytes) -> List[Tuple[float, model.Post]]:
         return []
 
 
+def search_by_source(sources:List[str]) -> List[Tuple[int, str]]:
+    assert sources
+    found = (
+        db.session.query(model.Post.post_id, model.Post.source)
+        .filter(
+            sa.sql.or_(
+                *[model.Post.source.contains(s) for s in sources]
+            )
+        )
+        .all()
+    )
+    return found
+
+
 PoolPostsNearby = namedtuple('PoolPostsNearby', 'pool first_post prev_post next_post last_post')
 def get_pools_nearby(
     post: model.Post
