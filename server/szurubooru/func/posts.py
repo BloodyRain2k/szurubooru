@@ -1158,8 +1158,9 @@ def search_by_image(image_content: bytes) -> List[Tuple[float, model.Post]]:
         return []
 
 
-def search_by_source(sources:List[str]) -> List[Tuple[int, str]]:
+def search_by_source(sources:List[str], limit:int=None, offset:int=None) -> List[Tuple[int, str]]:
     assert sources
+    sources = [src.replace("%", "\\%").replace("*", "%") for src in sources]
     found = (
         db.session.query(model.Post.post_id, model.Post.source)
         .filter(
@@ -1167,6 +1168,9 @@ def search_by_source(sources:List[str]) -> List[Tuple[int, str]]:
                 *[model.Post.source.contains(s) for s in sources]
             )
         )
+        .order_by(model.Post.post_id)
+        .offset(offset or 0)
+        .limit(limit or 100)
         .all()
     )
     return found

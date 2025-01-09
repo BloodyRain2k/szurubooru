@@ -243,7 +243,9 @@ def delete_post(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
 @rest.routes.post("/sources/?")
 def source_lookup(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
     sources = ctx.get_param_as_string_list("sources")
-    found = posts.search_by_source(sources)
+    offset = ctx.get_param_as_int("offset", None)
+    limit = ctx.get_param_as_int("limit", None, max = 1000)
+    found = posts.search_by_source(sources, limit, offset)
     result = {
         "by_id": {},
         "by_source": {},
@@ -258,7 +260,7 @@ def source_lookup(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
                 result["by_source"][src] = []
             if src not in result["by_source"][src]:
                 result["by_source"][src].append(r_id)
-    result["unknown"] = [s for s in sources if s not in result["by_source"]]
+    result["unknown"] = [s for s in sources if s not in result["by_source"] and "*" not in s]
     return result
 
 
