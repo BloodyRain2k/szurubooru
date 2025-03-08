@@ -1158,22 +1158,25 @@ def search_by_image(image_content: bytes) -> List[Tuple[float, model.Post]]:
         return []
 
 
-def search_by_source(sources:List[str], limit:int=None, offset:int=None) -> List[Tuple[int, str]]:
+def search_by_source(sources:List[str], limit:int=None, offset:int=None) -> Tuple[List[Tuple[int, str]], int]:
     assert sources
-    sources = [src.replace("%", "\\%").replace("*", "%") for src in sources]
-    found = (
+    sources = [src.replace("%", "\\%").replace("*", "%").lower() for src in sources]
+    query = (
         db.session.query(model.Post.post_id, model.Post.source)
         .filter(
             sa.sql.or_(
-                *[model.Post.source.contains(s) for s in sources]
+                *[sa.sql.func.lower(model.Post.source).contains(s) for s in sources]
             )
         )
+    )
+    found = (
+        query
         .order_by(model.Post.post_id)
         .offset(offset or 0)
         .limit(limit or 100)
         .all()
     )
-    return found
+    return found, query.count()
 
 
 PoolPostsNearby = namedtuple('PoolPostsNearby', 'pool first_post prev_post next_post last_post')

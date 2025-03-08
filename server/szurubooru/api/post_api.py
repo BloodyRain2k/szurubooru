@@ -243,10 +243,10 @@ def delete_post(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
 @rest.routes.post("/sources/?")
 def source_lookup(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
     sources = ctx.get_param_as_string_list("sources")
-    offset = ctx.get_param_as_int("offset", None)
-    limit = ctx.get_param_as_int("limit", None, max = 1000)
-    found = posts.search_by_source(sources, limit, offset)
-    result = {
+    offset = ctx.get_param_as_int("offset", 0)
+    limit = ctx.get_param_as_int("limit", 200, max = 1000)
+    found, total = posts.search_by_source(sources, limit, offset)
+    results = {
         "by_id": {},
         "by_source": {},
         "unknown": [],
@@ -254,14 +254,19 @@ def source_lookup(ctx: rest.Context, params: Dict[str, str]) -> rest.Response:
     for res in found:
         r_id = res[0]
         r_sources = res[1].split("\n")
-        result["by_id"][r_id] = r_sources
+        results["by_id"][r_id] = r_sources
         for src in r_sources:
-            if src not in result["by_source"]:
-                result["by_source"][src] = []
-            if src not in result["by_source"][src]:
-                result["by_source"][src].append(r_id)
-    result["unknown"] = [s for s in sources if s not in result["by_source"] and "*" not in s]
-    return result
+            if src not in results["by_source"]:
+                results["by_source"][src] = []
+            if src not in results["by_source"][src]:
+                results["by_source"][src].append(r_id)
+    results["unknown"] = [s for s in sources if s not in results["by_source"] and "*" not in s]
+    return {
+        "offset": offset,
+        "limit": limit,
+        "total": total,
+        "results": results,
+    }
 
 
 @rest.routes.post("/post-merge/?")
